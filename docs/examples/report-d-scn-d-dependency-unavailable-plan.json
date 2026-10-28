@@ -1,0 +1,68 @@
+{
+  "format": "recoveryproof.recovery_plan",
+  "format_version": 1,
+  "analysis_version": "2026.10.1",
+  "generated_at": "2026-10-28T07:09:41+00:00",
+  "organization": "Northwind Logistics (fictional)",
+  "data_source": "Bundled synthetic baseline",
+  "scenario_id": "SCN-D-DEPENDENCY-UNAVAILABLE",
+  "scenario_title": "Critical dependency unavailable",
+  "as_of": "2026-10-20T09:00:00+00:00",
+  "incident_at": "2026-10-20T09:00:00+00:00",
+  "recovery_plan": {
+    "scope": "affected",
+    "steps": [
+      {
+        "order": 1,
+        "asset_id": "db-orders",
+        "name": "Orders Database (PostgreSQL)",
+        "criticality": "tier0",
+        "wave": null,
+        "depends_on": [],
+        "recovery_point_id": null,
+        "start_minute": null,
+        "finish_minute": null,
+        "duration_minutes": 75,
+        "duration_basis": "measured (EV-RST-DBORD-202610120900)",
+        "rto_minutes": 120,
+        "rto_status": "breached",
+        "blocked": true,
+        "blocked_reason": "cannot be restored: Backup encryption key disabled and pending deletion; recovery points cannot be decrypted"
+      },
+      {
+        "order": 2,
+        "asset_id": "app-orders-api",
+        "name": "Orders API Service",
+        "criticality": "tier0",
+        "wave": null,
+        "depends_on": [
+          "db-orders"
+        ],
+        "recovery_point_id": "RP-ORDAPI-202610200200-P",
+        "start_minute": null,
+        "finish_minute": null,
+        "duration_minutes": 25,
+        "duration_basis": "measured (EV-RST-ORDAPI-202610051200)",
+        "rto_minutes": 150,
+        "rto_status": "breached",
+        "blocked": true,
+        "blocked_reason": "waiting on blocked prerequisite(s): db-orders"
+      }
+    ],
+    "parallel_minutes": null,
+    "parallel_lower_bound_minutes": null,
+    "serial_minutes": null,
+    "unknown_duration_assets": [],
+    "blocked_assets": [
+      "app-orders-api",
+      "db-orders"
+    ],
+    "assumptions": [
+      "Recovery starts when the incident is declared (T+0). Detection, triage, forensic hold and decision time are not included in estimates.",
+      "The parallel estimate assumes unlimited restore capacity, so independent assets restore simultaneously; the serial estimate assumes one asset at a time. Reality lies between the two.",
+      "Restore durations come from the most recent passing restore test where one was measured; otherwise the documented estimate is used. Unknown durations are not guessed.",
+      "An asset may start restoring only after every prerequisite in the plan has finished.",
+      "Assets outside the plan scope are assumed to remain operational."
+    ]
+  }
+}

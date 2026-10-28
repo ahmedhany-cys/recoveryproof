@@ -1,0 +1,55 @@
+{
+  "id": "SCN-G-PRIMARY-VAULT-OUTAGE",
+  "code": "G",
+  "title": "Primary backup vault outage during database failure",
+  "category": "Infrastructure failure",
+  "severity": "high",
+  "variation_of": "SCN-E-CORRUPTED-NEWEST-POINT",
+  "narrative": "A storage-controller fault at 08:20 UTC takes down both production databases. The same fault makes the primary backup vault unreachable. Recovery has to use the daily copies in the isolated recovery vault.",
+  "incident_at": "2026-10-20T09:00:00Z",
+  "plan_scope": "affected",
+  "injections": [
+    {
+      "type": "repository_outage",
+      "at": "2026-10-20T08:20:00Z",
+      "repository_id": "vault-primary",
+      "description": "Primary vault unreachable due to shared storage-controller failure."
+    },
+    {
+      "type": "compromise_assets",
+      "at": "2026-10-20T08:20:00Z",
+      "asset_ids": [
+        "db-orders",
+        "db-customers"
+      ],
+      "description": "Database volumes lost in the storage failure."
+    }
+  ],
+  "recommended_actions": [
+    "Restore databases from the isolated vault",
+    "Separate primary vault storage from production storage"
+  ],
+  "expected": {
+    "blocked_assets": [],
+    "rto_breaches": [],
+    "rpo_breaches": [
+      "app-erp",
+      "aws-s3-exports",
+      "db-customers",
+      "db-orders",
+      "file-share",
+      "idp-core",
+      "kms-secrets",
+      "logging-siem",
+      "monitoring"
+    ],
+    "required_rules": [
+      "REPO-001",
+      "RP-002"
+    ],
+    "selected_points": {
+      "db-orders": "RP-DBORD-202610200100-I",
+      "db-customers": "RP-DBCUS-202610200100-I"
+    }
+  }
+}

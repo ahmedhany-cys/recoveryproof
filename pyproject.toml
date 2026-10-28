@@ -1,0 +1,104 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "recoveryproof"
+version = "1.0.0"
+description = "Prove recovery before disaster strikes: evidence-based disaster recovery readiness analysis."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12"
+authors = [{ name = "Ahmed Hany" }]
+keywords = ["disaster-recovery", "ransomware", "backup", "cyber-resilience", "rto", "rpo", "streamlit"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: System :: Recovery Tools",
+]
+dependencies = [
+    "pydantic>=2.9,<3",
+    "networkx>=3.3,<4",
+    "pandas>=2.2,<3",
+    "plotly>=5.24,<7",
+    "streamlit>=1.40,<2",
+    "jinja2>=3.1.4,<4",
+    "fpdf2>=2.8,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3,<10",
+    "pytest-cov>=5,<8",
+    "hypothesis>=6.100,<7",
+    "ruff>=0.8,<1",
+    "mypy>=1.13,<3",
+    "pandas-stubs>=2.2,<3",
+    "bandit>=1.7.10,<2",
+    "pip-audit>=2.7,<3",
+    "pypdf>=5,<7",
+]
+screenshots = ["playwright>=1.48,<2"]
+aws = ["boto3>=1.35,<2"]
+
+[project.scripts]
+recoveryproof = "recoveryproof.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+recoveryproof = ["reporting/templates/*.j2", "py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = [
+    "ui: Streamlit AppTest user-interface tests",
+    "e2e: browser tests against a running server (opt-in)",
+]
+
+[tool.coverage.run]
+source = ["recoveryproof"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError", "if __name__ == .__main__.:"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "RUF", "C4", "PT", "TID"]
+ignore = ["RUF001", "RUF002", "RUF003"]  # allow typographic characters (–, ×, …) in UI text
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106", "S108", "PT018"]
+"scripts/**" = ["S603", "S607"]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+strict = true
+warn_unused_ignores = true
+mypy_path = "src"
+packages = ["recoveryproof"]
+
+[[tool.mypy.overrides]]
+module = ["recoveryproof.ui.*"]
+# Streamlit/Plotly page code: keep typed signatures but allow untyped library calls.
+disallow_untyped_calls = false
+disallow_any_generics = false
+
+[[tool.mypy.overrides]]
+module = ["networkx.*", "plotly.*", "fpdf.*", "boto3.*", "botocore.*"]
+ignore_missing_imports = true
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv"]

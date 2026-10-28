@@ -1,0 +1,8 @@
+{
+  "restore_test_max_age_days": 90,
+  "min_retention_days": {"tier0": 35, "tier1": 30, "tier2": 14, "tier3": 7},
+  "require_isolated_copy": ["tier0", "tier1"],
+  "require_encryption_for": ["confidential", "restricted"],
+  "approved_backup_delete_roles": ["backup-admin"],
+  "shared_dependency_threshold": 3
+}

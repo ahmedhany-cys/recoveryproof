@@ -1,0 +1,285 @@
+{
+  "format": "recoveryproof.recovery_plan",
+  "format_version": 1,
+  "analysis_version": "2026.10.1",
+  "generated_at": "2026-10-28T07:09:41+00:00",
+  "organization": "Northwind Logistics (fictional)",
+  "data_source": "Bundled synthetic baseline",
+  "scenario_id": "SCN-BASELINE",
+  "scenario_title": "Baseline readiness (full-environment recovery rehearsal)",
+  "as_of": "2026-10-20T09:00:00+00:00",
+  "incident_at": "2026-10-20T09:00:00+00:00",
+  "recovery_plan": {
+    "scope": "all",
+    "steps": [
+      {
+        "order": 1,
+        "asset_id": "dns-core",
+        "name": "Core DNS & Network Services",
+        "criticality": "tier0",
+        "wave": 1,
+        "depends_on": [],
+        "recovery_point_id": "RP-DNS-202610200200-P",
+        "start_minute": 0,
+        "finish_minute": 15,
+        "duration_minutes": 15,
+        "duration_basis": "measured (EV-RST-DNS-202610031000)",
+        "rto_minutes": 30,
+        "rto_status": "met",
+        "blocked": false,
+        "blocked_reason": null
+      },
+      {
+        "order": 2,
+        "asset_id": "kms-secrets",
+        "name": "Secrets & Key Management",
+        "criticality": "tier0",
+        "wave": 2,
+        "depends_on": [
+          "dns-core"
+        ],
+        "recovery_point_id": "RP-KMS-202610200800-P",
+        "start_minute": 15,
+        "finish_minute": 40,
+        "duration_minutes": 25,
+        "duration_basis": "measured (EV-RST-KMS-202608301100)",
+        "rto_minutes": 45,
+        "rto_status": "met",
+        "blocked": false,
+        "blocked_reason": null
+      },
+      {
+        "order": 3,
+        "asset_id": "idp-core",
+        "name": "Identity Provider & SSO",
+        "criticality": "tier0",
+        "wave": 2,
+        "depends_on": [
+          "dns-core"
+        ],
+        "recovery_point_id": "RP-IDP-202610200830-P",
+        "start_minute": 15,
+        "finish_minute": 60,
+        "duration_minutes": 45,
+        "duration_basis": "measured (EV-RST-IDP-202609281400)",
+        "rto_minutes": 60,
+        "rto_status": "met",
+        "blocked": false,
+        "blocked_reason": null
+      },
+      {
+        "order": 4,
+        "asset_id": "db-customers",
+        "name": "Customer Database (PostgreSQL)",
+        "criticality": "tier0",
+        "wave": 3,
+        "depends_on": [
+          "dns-core",
+          "kms-secrets"
+        ],
+        "recovery_point_id": "RP-DBCUS-202610200800-P",
+        "start_minute": 40,
+        "finish_minute": 135,
+        "duration_minutes": 95,
+        "duration_basis": "measured (EV-RST-DBCUS-202606151300)",
+        "rto_minutes": 120,
+        "rto_status": "breached",
+        "blocked": false,
+        "blocked_reason": null
+      },
+      {
+        "order": 5,
+        "asset_id": "db-orders",
+        "name": "Orders Database (PostgreSQL)",
+        "criticality": "tier0",
+        "wave": 3,
+        "depends_on": [
+          "dns-core",
+          "kms-secrets"
+        ],
+        "recovery_point_id": "RP-DBORD-202610200845-P",
+        "start_minute": 40,
+        "finish_minute": 115,
+        "duration_minutes": 75,
+        "duration_basis": "measured (EV-RST-DBORD-202610120900)",
+        "rto_minutes": 120,
+        "rto_status": "met",
+        "blocked": false,
+        "blocked_reason": null
+      },
+      {
+        "order": 6,
+        "asset_id": "app-orders-api",
+        "name": "Orders API Service",
+        "criticality": "tier0",
+        "wave": 4,
+        "depends_on": [
+          "db-orders",
+          "idp-core",
+          "kms-secrets"
+        ],
+        "recovery_point_id": "RP-ORDAPI-202610200200-P",
+        "start_minute": 115,
+        "finish_minute": 140,
+        "duration_minutes": 25,
+        "duration_basis": "measured (EV-RST-ORDAPI-202610051200)",
+        "rto_minutes": 150,
+        "rto_status": "met",
+        "blocked": false,
+        "blocked_reason": null
+      },
+      {
+        "order": 7,
+        "asset_id": "web-storefront",
+        "name": "Customer Storefront",
+        "criticality": "tier0",
+        "wave": 5,
+        "depends_on": [
+          "app-orders-api",
+          "db-customers",
+          "idp-core"
+        ],
+        "recovery_point_id": "RP-WEB-202610200200-P",
+        "start_minute": 140,
+        "finish_minute": 170,
+        "duration_minutes": 30,
+        "duration_basis": "measured (EV-RST-WEB-202610051500)",
+        "rto_minutes": 180,
+        "rto_status": "met",
+        "blocked": false,
+        "blocked_reason": null
+      },
+      {
+        "order": 8,
+        "asset_id": "logging-siem",
+        "name": "Central Logging & SIEM",
+        "criticality": "tier1",
+        "wave": 2,
+        "depends_on": [
+          "dns-core"
+        ],
+        "recovery_point_id": "RP-SIEM-202610200700-P",
+        "start_minute": 15,
+        "finish_minute": 105,
+        "duration_minutes": 90,
+        "duration_basis": "measured (EV-RST-SIEM-202609201000)",
+        "rto_minutes": 240,
+        "rto_status": "met",
+        "blocked": false,
+        "blocked_reason": null
+      },
+      {
+        "order": 9,
+        "asset_id": "app-erp",
+        "name": "Internal ERP",
+        "criticality": "tier1",
+        "wave": 4,
+        "depends_on": [
+          "db-orders",
+          "idp-core"
+        ],
+        "recovery_point_id": "RP-ERP-202610200400-P",
+        "start_minute": 115,
+        "finish_minute": 235,
+        "duration_minutes": 120,
+        "duration_basis": "measured (EV-RST-ERP-202609101600)",
+        "rto_minutes": 480,
+        "rto_status": "met",
+        "blocked": false,
+        "blocked_reason": null
+      },
+      {
+        "order": 10,
+        "asset_id": "monitoring",
+        "name": "Monitoring & Alerting",
+        "criticality": "tier2",
+        "wave": 3,
+        "depends_on": [
+          "dns-core",
+          "idp-core"
+        ],
+        "recovery_point_id": "RP-MON-202610200000-P",
+        "start_minute": 60,
+        "finish_minute": 120,
+        "duration_minutes": 60,
+        "duration_basis": "estimated",
+        "rto_minutes": 480,
+        "rto_status": "met",
+        "blocked": false,
+        "blocked_reason": null
+      },
+      {
+        "order": 11,
+        "asset_id": "file-share",
+        "name": "Corporate File Storage",
+        "criticality": "tier2",
+        "wave": 3,
+        "depends_on": [
+          "idp-core"
+        ],
+        "recovery_point_id": "RP-FILES-202610200100-P",
+        "start_minute": 60,
+        "finish_minute": 1860,
+        "duration_minutes": 1800,
+        "duration_basis": "estimated",
+        "rto_minutes": 1440,
+        "rto_status": "breached",
+        "blocked": false,
+        "blocked_reason": null
+      },
+      {
+        "order": 12,
+        "asset_id": "aws-s3-exports",
+        "name": "Analytics Export Bucket (AWS S3)",
+        "criticality": "tier3",
+        "wave": null,
+        "depends_on": [],
+        "recovery_point_id": null,
+        "start_minute": null,
+        "finish_minute": null,
+        "duration_minutes": null,
+        "duration_basis": null,
+        "rto_minutes": 2880,
+        "rto_status": "breached",
+        "blocked": true,
+        "blocked_reason": "no eligible recovery point"
+      },
+      {
+        "order": 13,
+        "asset_id": "hr-portal",
+        "name": "HR Self-Service Portal",
+        "criticality": "tier3",
+        "wave": 4,
+        "depends_on": [
+          "file-share",
+          "idp-core"
+        ],
+        "recovery_point_id": "RP-HR-202610192300-P",
+        "start_minute": 1860,
+        "finish_minute": null,
+        "duration_minutes": null,
+        "duration_basis": null,
+        "rto_minutes": null,
+        "rto_status": "unknown",
+        "blocked": false,
+        "blocked_reason": null
+      }
+    ],
+    "parallel_minutes": null,
+    "parallel_lower_bound_minutes": 1860,
+    "serial_minutes": null,
+    "unknown_duration_assets": [
+      "hr-portal"
+    ],
+    "blocked_assets": [
+      "aws-s3-exports"
+    ],
+    "assumptions": [
+      "Recovery starts when the incident is declared (T+0). Detection, triage, forensic hold and decision time are not included in estimates.",
+      "The parallel estimate assumes unlimited restore capacity, so independent assets restore simultaneously; the serial estimate assumes one asset at a time. Reality lies between the two.",
+      "Restore durations come from the most recent passing restore test where one was measured; otherwise the documented estimate is used. Unknown durations are not guessed.",
+      "An asset may start restoring only after every prerequisite in the plan has finished.",
+      "Assets outside the plan scope are assumed to remain operational."
+    ]
+  }
+}

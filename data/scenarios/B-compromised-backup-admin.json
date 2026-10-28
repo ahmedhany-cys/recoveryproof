@@ -1,0 +1,92 @@
+{
+  "id": "SCN-B-BACKUP-ADMIN-COMPROMISE",
+  "code": "B",
+  "title": "Compromised backup administrator",
+  "category": "Credential compromise",
+  "severity": "critical",
+  "narrative": "At 07:40 UTC an attacker phishes the backup administrator and gains the 'backup-admin' role. That role can bypass governance-mode retention on the primary vault. The attacker deletes the two newest ERP recovery points, then tries and fails to delete a database copy in the isolated vault. The intrusion is detected at 09:00. No production system is down yet, but leadership must know which systems would still be recoverable if the attacker followed up with ransomware.",
+  "incident_at": "2026-10-20T09:00:00Z",
+  "plan_scope": "all",
+  "injections": [
+    {
+      "type": "compromise_principal",
+      "at": "2026-10-20T07:40:00Z",
+      "role": "backup-admin",
+      "description": "Attacker obtained an active session for the backup-admin role through phishing."
+    },
+    {
+      "type": "delete_recovery_points",
+      "at": "2026-10-20T08:10:00Z",
+      "recovery_point_ids": [
+        "RP-ERP-202610200800-P",
+        "RP-ERP-202610200400-P"
+      ],
+      "actor": "backup-admin",
+      "description": "Attacker deleted ERP recovery points using the governance-bypass permission."
+    },
+    {
+      "type": "delete_recovery_points",
+      "at": "2026-10-20T08:15:00Z",
+      "recovery_point_ids": [
+        "RP-DBORD-202610200100-I"
+      ],
+      "actor": "backup-admin",
+      "description": "Attacker attempted to delete the isolated copy of the orders database."
+    }
+  ],
+  "recommended_actions": [
+    "Revoke backup-admin sessions manually through the identity provider",
+    "Treat every point in the primary vault as untrusted until it is re-verified",
+    "Re-verify primary-vault recovery points from a trusted workstation",
+    "Remove governance-bypass rights from standing roles"
+  ],
+  "expected": {
+    "readiness_min": 55,
+    "readiness_max": 70,
+    "blocked_assets": [
+      "app-erp",
+      "aws-s3-exports",
+      "file-share",
+      "hr-portal",
+      "monitoring"
+    ],
+    "rto_breaches": [
+      "app-erp",
+      "aws-s3-exports",
+      "db-customers",
+      "file-share",
+      "monitoring"
+    ],
+    "rpo_breaches": [
+      "app-erp",
+      "aws-s3-exports",
+      "db-customers",
+      "db-orders",
+      "file-share",
+      "idp-core",
+      "kms-secrets",
+      "logging-siem",
+      "monitoring"
+    ],
+    "required_rules": [
+      "ACC-002",
+      "RP-001",
+      "ISO-003"
+    ],
+    "selected_points": {
+      "db-orders": "RP-DBORD-202610200100-I",
+      "app-erp": null,
+      "file-share": null
+    },
+    "order_constraints": [
+      [
+        "dns-core",
+        "idp-core"
+      ],
+      [
+        "kms-secrets",
+        "db-orders"
+      ]
+    ]
+  }
+}

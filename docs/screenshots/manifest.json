@@ -1,0 +1,260 @@
+{
+  "generated_by": "scripts/capture_screenshots.py",
+  "method": "Real browser screenshots of the locally running Streamlit app (no image editing).",
+  "host": "Darwin arm64",
+  "screenshots": [
+    {
+      "file": "01-executive-overview.png",
+      "path": "/?scenario=BL",
+      "title": "Executive Overview",
+      "state": "Baseline (no incident): readiness 85.7/100 Moderate, KPI cards and top remediation items.",
+      "select": {},
+      "segment": null,
+      "scroll_to": null,
+      "must_contain": [
+        "Executive Overview",
+        "85.7",
+        "Highest-priority remediation"
+      ],
+      "url": "http://127.0.0.1:8501/?scenario=BL",
+      "captured_at": "2026-10-28T07:08:57+00:00",
+      "viewport": "1440x960 @ 1.5x",
+      "browser": "Google Chrome 156.0.8078.49 (Playwright channel=chrome)",
+      "verified_text_present": true,
+      "missing_text": [],
+      "bytes": 313408
+    },
+    {
+      "file": "02-asset-inventory.png",
+      "path": "/assets?scenario=BL",
+      "title": "Asset Inventory",
+      "state": "Baseline: all 15 synthetic assets with criticality, RTO/RPO, dependencies and recovery evidence.",
+      "select": {},
+      "segment": null,
+      "scroll_to": null,
+      "must_contain": [
+        "Asset Inventory",
+        "15 of 15 assets shown"
+      ],
+      "url": "http://127.0.0.1:8501/assets?scenario=BL",
+      "captured_at": "2026-10-28T07:09:00+00:00",
+      "viewport": "1440x960 @ 1.5x",
+      "browser": "Google Chrome 156.0.8078.49 (Playwright channel=chrome)",
+      "verified_text_present": true,
+      "missing_text": [],
+      "bytes": 448286
+    },
+    {
+      "file": "03-backup-health.png",
+      "path": "/backups?scenario=BL",
+      "title": "Backup Health",
+      "state": "Baseline: per-system recovery evidence, selected recovery point, RPO status and isolation.",
+      "select": {},
+      "segment": null,
+      "scroll_to": null,
+      "must_contain": [
+        "Backup Health",
+        "Recovery points (last 3 days)",
+        "isolated vault"
+      ],
+      "url": "http://127.0.0.1:8501/backups?scenario=BL",
+      "captured_at": "2026-10-28T07:09:03+00:00",
+      "viewport": "1440x960 @ 1.5x",
+      "browser": "Google Chrome 156.0.8078.49 (Playwright channel=chrome)",
+      "verified_text_present": true,
+      "missing_text": [],
+      "bytes": 427524
+    },
+    {
+      "file": "04-recovery-dependency-graph.png",
+      "path": "/dependencies?scenario=D",
+      "title": "Recovery Dependency Graph",
+      "state": "Scenario D with impact analysis on db-orders: blocked nodes in red, impacted dependents highlighted.",
+      "select": {
+        "Impact analysis \u2014 what if this system were unavailable?": "db-orders"
+      },
+      "segment": null,
+      "scroll_to": null,
+      "must_contain": [
+        "Impact if db-orders is unavailable",
+        "3 dependent systems"
+      ],
+      "url": "http://127.0.0.1:8501/dependencies?scenario=D",
+      "captured_at": "2026-10-28T07:09:08+00:00",
+      "viewport": "1440x960 @ 1.5x",
+      "browser": "Google Chrome 156.0.8078.49 (Playwright channel=chrome)",
+      "verified_text_present": true,
+      "missing_text": [],
+      "bytes": 288717
+    },
+    {
+      "file": "05-ransomware-scenario.png",
+      "path": "/plan?scenario=A",
+      "title": "Scenario A \u2014 Ransomware with intact backups",
+      "state": "Recovery plan for Scenario A: dependency-ordered restore, Gantt with RTO markers, file-share RTO breach.",
+      "select": {},
+      "segment": null,
+      "scroll_to": null,
+      "must_contain": [
+        "Ransomware with intact backups",
+        "Recovery Plan",
+        "1 d 6 h"
+      ],
+      "url": "http://127.0.0.1:8501/plan?scenario=A",
+      "captured_at": "2026-10-28T07:09:11+00:00",
+      "viewport": "1440x960 @ 1.5x",
+      "browser": "Google Chrome 156.0.8078.49 (Playwright channel=chrome)",
+      "verified_text_present": true,
+      "missing_text": [],
+      "bytes": 356728
+    },
+    {
+      "file": "06-compromised-backup-scenario.png",
+      "path": "/?scenario=B",
+      "title": "Scenario B \u2014 Compromised backup administrator",
+      "state": "Executive overview under Scenario B: readiness falls to 67.6 (Weak); critical ACC-002 findings.",
+      "select": {},
+      "segment": null,
+      "scroll_to": null,
+      "must_contain": [
+        "Compromised backup administrator",
+        "67.6"
+      ],
+      "url": "http://127.0.0.1:8501/?scenario=B",
+      "captured_at": "2026-10-28T07:09:14+00:00",
+      "viewport": "1440x960 @ 1.5x",
+      "browser": "Google Chrome 156.0.8078.49 (Playwright channel=chrome)",
+      "verified_text_present": true,
+      "missing_text": [],
+      "bytes": 300412
+    },
+    {
+      "file": "07-stale-backup-scenario.png",
+      "path": "/simulator?scenario=C",
+      "title": "Scenario C \u2014 Stale database backup",
+      "state": "Simulator before/after comparison for Scenario C: db-orders exposure 1 d 2 h vs 15 min RPO.",
+      "select": {},
+      "segment": null,
+      "scroll_to": "Before / after comparison",
+      "must_contain": [
+        "Stale database backup",
+        "Before / after comparison",
+        "expectation checks pass"
+      ],
+      "url": "http://127.0.0.1:8501/simulator?scenario=C",
+      "captured_at": "2026-10-28T07:09:18+00:00",
+      "viewport": "1440x960 @ 1.5x",
+      "browser": "Google Chrome 156.0.8078.49 (Playwright channel=chrome)",
+      "verified_text_present": true,
+      "missing_text": [],
+      "bytes": 325866
+    },
+    {
+      "file": "08-unavailable-dependency-scenario.png",
+      "path": "/plan?scenario=D",
+      "title": "Scenario D \u2014 Critical dependency unavailable",
+      "state": "Recovery plan for Scenario D: db-orders unrecoverable, Orders API blocked although its backup is intact.",
+      "select": {},
+      "segment": null,
+      "scroll_to": null,
+      "must_contain": [
+        "Critical dependency unavailable",
+        "BLOCKED"
+      ],
+      "url": "http://127.0.0.1:8501/plan?scenario=D",
+      "captured_at": "2026-10-28T07:09:21+00:00",
+      "viewport": "1440x960 @ 1.5x",
+      "browser": "Google Chrome 156.0.8078.49 (Playwright channel=chrome)",
+      "verified_text_present": true,
+      "missing_text": [],
+      "bytes": 276053
+    },
+    {
+      "file": "09-corrupted-backup-scenario.png",
+      "path": "/backups?scenario=E",
+      "title": "Scenario E \u2014 Corrupted newest recovery point",
+      "state": "Backup drill-down for db-customers under Scenario E: newest point failed integrity, fallback to 07:00.",
+      "select": {
+        "System": "Customer Database (PostgreSQL)"
+      },
+      "segment": null,
+      "scroll_to": "Recovery point drill-down",
+      "must_contain": [
+        "Corrupted newest recovery point",
+        "Recovery point drill-down",
+        "Customer Database"
+      ],
+      "url": "http://127.0.0.1:8501/backups?scenario=E",
+      "captured_at": "2026-10-28T07:09:27+00:00",
+      "viewport": "1440x960 @ 1.5x",
+      "browser": "Google Chrome 156.0.8078.49 (Playwright channel=chrome)",
+      "verified_text_present": true,
+      "missing_text": [],
+      "bytes": 308178
+    },
+    {
+      "file": "10-remediation-findings.png",
+      "path": "/findings?scenario=B",
+      "title": "Findings & Remediation",
+      "state": "Scenario B findings with severity counts, filters and the ACC-002 finding detail with remediation.",
+      "select": {
+        "Finding": "F-ACC-002-app-erp"
+      },
+      "segment": null,
+      "scroll_to": "Finding detail",
+      "must_contain": [
+        "Findings & Remediation",
+        "F-ACC-002-app-erp"
+      ],
+      "url": "http://127.0.0.1:8501/findings?scenario=B",
+      "captured_at": "2026-10-28T07:09:32+00:00",
+      "viewport": "1440x960 @ 1.5x",
+      "browser": "Google Chrome 156.0.8078.49 (Playwright channel=chrome)",
+      "verified_text_present": true,
+      "missing_text": [],
+      "bytes": 330492
+    },
+    {
+      "file": "11-evidence-explorer.png",
+      "path": "/evidence?scenario=E",
+      "title": "Evidence Explorer",
+      "state": "Tracing finding F-RP-003-db-customers to the scenario-injected integrity-failure evidence record.",
+      "select": {
+        "Finding": "F-RP-003-db-customers"
+      },
+      "segment": null,
+      "scroll_to": null,
+      "must_contain": [
+        "Evidence Explorer",
+        "EV-E-SIM-01"
+      ],
+      "url": "http://127.0.0.1:8501/evidence?scenario=E",
+      "captured_at": "2026-10-28T07:09:37+00:00",
+      "viewport": "1440x960 @ 1.5x",
+      "browser": "Google Chrome 156.0.8078.49 (Playwright channel=chrome)",
+      "verified_text_present": true,
+      "missing_text": [],
+      "bytes": 323161
+    },
+    {
+      "file": "12-recovery-report.png",
+      "path": "/reports?scenario=D",
+      "title": "Reports & Export",
+      "state": "Scenario D report page: HTML/PDF/JSON exports and the rendered executive report preview.",
+      "select": {},
+      "segment": null,
+      "scroll_to": null,
+      "must_contain": [
+        "Reports & Export",
+        "PDF report"
+      ],
+      "url": "http://127.0.0.1:8501/reports?scenario=D",
+      "captured_at": "2026-10-28T07:09:40+00:00",
+      "viewport": "1440x960 @ 1.5x",
+      "browser": "Google Chrome 156.0.8078.49 (Playwright channel=chrome)",
+      "verified_text_present": true,
+      "missing_text": [],
+      "bytes": 354034
+    }
+  ]
+}

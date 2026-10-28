@@ -1,0 +1,71 @@
+{
+  "id": "SCN-A-RANSOMWARE-INTACT",
+  "code": "A",
+  "title": "Ransomware with intact backups",
+  "category": "Ransomware",
+  "severity": "high",
+  "narrative": "At 08:52 UTC ransomware begins encrypting production workloads in the commerce and back-office environments. The SOC isolates the network segment and declares an incident at 09:00. Six systems are encrypted. The identity provider, key management and DNS were not reached. Backups in both vaults were not touched and their integrity evidence is intact. The question for leadership: how fast can we restore, in what order, and what risk remains?",
+  "incident_at": "2026-10-20T09:00:00Z",
+  "plan_scope": "affected",
+  "injections": [
+    {
+      "type": "compromise_assets",
+      "at": "2026-10-20T08:52:00Z",
+      "asset_ids": [
+        "web-storefront",
+        "app-orders-api",
+        "db-orders",
+        "db-customers",
+        "app-erp",
+        "file-share"
+      ],
+      "description": "Ransomware encrypted the volumes of six production systems. Backup vaults were not reached."
+    }
+  ],
+  "recommended_actions": [
+    "Restore databases first, then the Orders API, then the storefront",
+    "Scan restored systems before reconnecting them to production",
+    "Plan around the file-share restore: the estimate exceeds its RTO",
+    "Add an isolated copy for the ERP system"
+  ],
+  "expected": {
+    "readiness_min": 80,
+    "readiness_max": 90,
+    "blocked_assets": [],
+    "rto_breaches": [
+      "file-share"
+    ],
+    "rpo_breaches": [
+      "app-erp",
+      "aws-s3-exports",
+      "logging-siem"
+    ],
+    "required_rules": [
+      "RTO-001",
+      "ISO-001",
+      "RP-005"
+    ],
+    "selected_points": {
+      "db-orders": "RP-DBORD-202610200845-P",
+      "db-customers": "RP-DBCUS-202610200800-P"
+    },
+    "order_constraints": [
+      [
+        "db-orders",
+        "app-orders-api"
+      ],
+      [
+        "app-orders-api",
+        "web-storefront"
+      ],
+      [
+        "db-customers",
+        "web-storefront"
+      ],
+      [
+        "db-orders",
+        "app-erp"
+      ]
+    ]
+  }
+}

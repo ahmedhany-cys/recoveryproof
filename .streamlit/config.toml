@@ -1,0 +1,21 @@
+[theme]
+base = "dark"
+primaryColor = "#3b82f6"
+backgroundColor = "#0b1220"
+secondaryBackgroundColor = "#111a2e"
+textColor = "#e2e8f0"
+font = "sans serif"
+
+[server]
+# Uploads are validated inventory JSON only; keep them small.
+maxUploadSize = 2
+headless = true
+enableXsrfProtection = true
+
+[browser]
+# No telemetry: the app makes no outbound network calls by default.
+gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"
+showErrorDetails = "type"

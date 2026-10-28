@@ -1,0 +1,59 @@
+{
+  "id": "SCN-D-DEPENDENCY-UNAVAILABLE",
+  "code": "D",
+  "title": "Critical dependency unavailable",
+  "category": "Dependency failure",
+  "severity": "critical",
+  "narrative": "At 08:30 UTC ransomware encrypts the Orders API servers. The API's own backups are intact. While investigating, responders find the attacker had disabled and scheduled deletion of the customer-managed key that encrypts the orders database backups (08:35 UTC). The database is down and its recovery points cannot be decrypted. Restoring the API alone will not bring the service back.",
+  "incident_at": "2026-10-20T09:00:00Z",
+  "plan_scope": "affected",
+  "injections": [
+    {
+      "type": "compromise_assets",
+      "at": "2026-10-20T08:30:00Z",
+      "asset_ids": [
+        "app-orders-api"
+      ],
+      "description": "Ransomware encrypted the Orders API application servers."
+    },
+    {
+      "type": "mark_unrecoverable",
+      "at": "2026-10-20T08:35:00Z",
+      "asset_ids": [
+        "db-orders"
+      ],
+      "reason": "Backup encryption key disabled and pending deletion; recovery points cannot be decrypted",
+      "description": "Attacker disabled the customer-managed key for database backups. The database instance was also terminated."
+    }
+  ],
+  "recommended_actions": [
+    "Cancel the key deletion and re-enable the key (the provider's waiting period allows this)",
+    "Do not bring up the Orders API until the database is available",
+    "Use an isolated copy encrypted with a different key"
+  ],
+  "expected": {
+    "readiness_max": 75,
+    "blocked_assets": [
+      "app-orders-api",
+      "db-orders"
+    ],
+    "rto_breaches": [
+      "app-orders-api",
+      "db-orders"
+    ],
+    "rpo_breaches": [
+      "app-erp",
+      "aws-s3-exports",
+      "db-orders",
+      "logging-siem"
+    ],
+    "required_rules": [
+      "DEP-003",
+      "RP-001"
+    ],
+    "selected_points": {
+      "db-orders": null,
+      "app-orders-api": "RP-ORDAPI-202610200200-P"
+    }
+  }
+}

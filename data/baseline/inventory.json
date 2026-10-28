@@ -1,0 +1,1416 @@
+{
+  "schema_version": "1.0",
+  "organization": "Northwind Logistics (fictional)",
+  "description": "Synthetic enterprise environment for demonstrating RecoveryProof. All data is fictional.",
+  "as_of": "2026-10-20T09:00:00Z",
+  "assets": [
+    {
+      "id": "dns-core",
+      "name": "Core DNS & Network Services",
+      "asset_type": "infrastructure",
+      "criticality": "tier0",
+      "owner": "Network Engineering",
+      "description": "Internal DNS, DHCP and core routing configuration.",
+      "rto_minutes": 30,
+      "rpo_minutes": 1440,
+      "data_sensitivity": "internal",
+      "backup": {
+        "schedule_minutes": 1440,
+        "retention_days": 35,
+        "encrypted": true,
+        "recovery_points": [
+          {
+            "id": "RP-DNS-202610200200-P",
+            "created_at": "2026-10-20T02:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-DNS-202610200200-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-DNS-202610190200-P",
+            "created_at": "2026-10-19T02:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-DNS-202610190200-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-DNS-202610180200-P",
+            "created_at": "2026-10-18T02:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-DNS-202610180200-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-DNS-202610010200-P",
+            "created_at": "2026-10-01T02:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-DNS-202610010200-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-DNS-202610200200-I",
+            "created_at": "2026-10-20T02:00:00Z",
+            "repository_id": "vault-isolated",
+            "evidence_ids": [
+              "EV-INT-DNS-202610200200-I"
+            ],
+            "reported_integrity": "passed"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "EV-RST-DNS-202610031000"
+      ],
+      "environment": "production",
+      "depends_on": [],
+      "last_verified_at": "2026-10-20T02:20:00Z"
+    },
+    {
+      "id": "idp-core",
+      "name": "Identity Provider & SSO",
+      "asset_type": "identity",
+      "criticality": "tier0",
+      "owner": "Identity & Access Management",
+      "description": "Workforce and customer SSO, MFA and directory.",
+      "rto_minutes": 60,
+      "rpo_minutes": 60,
+      "depends_on": [
+        "dns-core"
+      ],
+      "data_sensitivity": "restricted",
+      "backup": {
+        "schedule_minutes": 60,
+        "retention_days": 35,
+        "encrypted": true,
+        "recovery_points": [
+          {
+            "id": "RP-IDP-202610200830-P",
+            "created_at": "2026-10-20T08:30:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-IDP-202610200830-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-IDP-202610200730-P",
+            "created_at": "2026-10-20T07:30:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-IDP-202610200730-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-IDP-202610200630-P",
+            "created_at": "2026-10-20T06:30:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-IDP-202610200630-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-IDP-202609270830-P",
+            "created_at": "2026-09-27T08:30:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-IDP-202609270830-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-IDP-202610200130-I",
+            "created_at": "2026-10-20T01:30:00Z",
+            "repository_id": "vault-isolated",
+            "evidence_ids": [
+              "EV-INT-IDP-202610200130-I"
+            ],
+            "reported_integrity": "passed"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "EV-RST-IDP-202609281400"
+      ],
+      "environment": "production",
+      "last_verified_at": "2026-10-20T08:50:00Z"
+    },
+    {
+      "id": "kms-secrets",
+      "name": "Secrets & Key Management",
+      "asset_type": "security",
+      "criticality": "tier0",
+      "owner": "Security Engineering",
+      "description": "Secrets vault and encryption keys used by databases and services.",
+      "rto_minutes": 45,
+      "rpo_minutes": 240,
+      "depends_on": [
+        "dns-core"
+      ],
+      "data_sensitivity": "restricted",
+      "backup": {
+        "schedule_minutes": 240,
+        "retention_days": 35,
+        "encrypted": true,
+        "recovery_points": [
+          {
+            "id": "RP-KMS-202610200800-P",
+            "created_at": "2026-10-20T08:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-KMS-202610200800-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-KMS-202610200400-P",
+            "created_at": "2026-10-20T04:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-KMS-202610200400-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-KMS-202610200000-P",
+            "created_at": "2026-10-20T00:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-KMS-202610200000-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-KMS-202608290800-P",
+            "created_at": "2026-08-29T08:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-KMS-202608290800-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-KMS-202610200000-I",
+            "created_at": "2026-10-20T00:00:00Z",
+            "repository_id": "vault-isolated",
+            "evidence_ids": [
+              "EV-INT-KMS-202610200000-I"
+            ],
+            "reported_integrity": "passed"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "EV-RST-KMS-202608301100"
+      ],
+      "environment": "production",
+      "last_verified_at": "2026-10-20T08:20:00Z"
+    },
+    {
+      "id": "db-orders",
+      "name": "Orders Database (PostgreSQL)",
+      "asset_type": "database",
+      "criticality": "tier0",
+      "owner": "Data Platform",
+      "description": "System of record for customer orders and fulfilment status.",
+      "rto_minutes": 120,
+      "rpo_minutes": 15,
+      "depends_on": [
+        "dns-core",
+        "kms-secrets"
+      ],
+      "data_sensitivity": "confidential",
+      "backup": {
+        "schedule_minutes": 15,
+        "retention_days": 35,
+        "encrypted": true,
+        "recovery_points": [
+          {
+            "id": "RP-DBORD-202610200845-P",
+            "created_at": "2026-10-20T08:45:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-DBORD-202610200845-P"
+            ],
+            "size_gb": 820.0,
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-DBORD-202610200830-P",
+            "created_at": "2026-10-20T08:30:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-DBORD-202610200830-P"
+            ],
+            "size_gb": 820.0,
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-DBORD-202610200815-P",
+            "created_at": "2026-10-20T08:15:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-DBORD-202610200815-P"
+            ],
+            "size_gb": 820.0,
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-DBORD-202610190645-P",
+            "created_at": "2026-10-19T06:45:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-DBORD-202610190645-P"
+            ],
+            "size_gb": 820.0,
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-DBORD-202610120200-P",
+            "created_at": "2026-10-12T02:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-DBORD-202610120200-P"
+            ],
+            "size_gb": 820.0,
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-DBORD-202610200100-I",
+            "created_at": "2026-10-20T01:00:00Z",
+            "repository_id": "vault-isolated",
+            "evidence_ids": [
+              "EV-INT-DBORD-202610200100-I"
+            ],
+            "size_gb": 818.0,
+            "reported_integrity": "passed"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "EV-RST-DBORD-202610120900"
+      ],
+      "environment": "production",
+      "last_verified_at": "2026-10-20T09:05:00Z"
+    },
+    {
+      "id": "db-customers",
+      "name": "Customer Database (PostgreSQL)",
+      "asset_type": "database",
+      "criticality": "tier0",
+      "owner": "Data Platform",
+      "description": "Customer accounts, addresses and preferences (PII).",
+      "rto_minutes": 120,
+      "rpo_minutes": 60,
+      "depends_on": [
+        "dns-core",
+        "kms-secrets"
+      ],
+      "data_sensitivity": "restricted",
+      "backup": {
+        "schedule_minutes": 60,
+        "retention_days": 14,
+        "encrypted": true,
+        "recovery_points": [
+          {
+            "id": "RP-DBCUS-202610200800-P",
+            "created_at": "2026-10-20T08:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-DBCUS-202610200800-P"
+            ],
+            "size_gb": 460.0,
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-DBCUS-202610200700-P",
+            "created_at": "2026-10-20T07:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-DBCUS-202610200700-P"
+            ],
+            "size_gb": 460.0,
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-DBCUS-202610200600-P",
+            "created_at": "2026-10-20T06:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-DBCUS-202610200600-P"
+            ],
+            "size_gb": 460.0,
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-DBCUS-202610200100-I",
+            "created_at": "2026-10-20T01:00:00Z",
+            "repository_id": "vault-isolated",
+            "evidence_ids": [
+              "EV-INT-DBCUS-202610200100-I"
+            ],
+            "size_gb": 459.0,
+            "reported_integrity": "passed"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "EV-RST-DBCUS-202606151300"
+      ],
+      "environment": "production",
+      "last_verified_at": "2026-10-20T08:20:00Z"
+    },
+    {
+      "id": "app-orders-api",
+      "name": "Orders API Service",
+      "asset_type": "app_server",
+      "criticality": "tier0",
+      "owner": "Commerce Engineering",
+      "description": "Stateless order-processing API (images, config, certificates).",
+      "rto_minutes": 150,
+      "rpo_minutes": 1440,
+      "depends_on": [
+        "db-orders",
+        "idp-core",
+        "kms-secrets"
+      ],
+      "data_sensitivity": "confidential",
+      "backup": {
+        "schedule_minutes": 1440,
+        "retention_days": 35,
+        "encrypted": true,
+        "recovery_points": [
+          {
+            "id": "RP-ORDAPI-202610200200-P",
+            "created_at": "2026-10-20T02:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-ORDAPI-202610200200-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-ORDAPI-202610190200-P",
+            "created_at": "2026-10-19T02:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-ORDAPI-202610190200-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-ORDAPI-202610050200-P",
+            "created_at": "2026-10-05T02:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-ORDAPI-202610050200-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-ORDAPI-202610200200-I",
+            "created_at": "2026-10-20T02:00:00Z",
+            "repository_id": "vault-isolated",
+            "evidence_ids": [
+              "EV-INT-ORDAPI-202610200200-I"
+            ],
+            "reported_integrity": "passed"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "EV-RST-ORDAPI-202610051200"
+      ],
+      "environment": "production",
+      "last_verified_at": "2026-10-20T02:20:00Z"
+    },
+    {
+      "id": "web-storefront",
+      "name": "Customer Storefront",
+      "asset_type": "web_app",
+      "criticality": "tier0",
+      "owner": "Commerce Engineering",
+      "description": "Public e-commerce website and checkout.",
+      "rto_minutes": 180,
+      "rpo_minutes": 1440,
+      "depends_on": [
+        "app-orders-api",
+        "db-customers",
+        "idp-core"
+      ],
+      "data_sensitivity": "internal",
+      "backup": {
+        "schedule_minutes": 1440,
+        "retention_days": 35,
+        "encrypted": true,
+        "recovery_points": [
+          {
+            "id": "RP-WEB-202610200200-P",
+            "created_at": "2026-10-20T02:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-WEB-202610200200-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-WEB-202610190200-P",
+            "created_at": "2026-10-19T02:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-WEB-202610190200-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-WEB-202610050200-P",
+            "created_at": "2026-10-05T02:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-WEB-202610050200-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-WEB-202610200200-I",
+            "created_at": "2026-10-20T02:00:00Z",
+            "repository_id": "vault-isolated",
+            "evidence_ids": [
+              "EV-INT-WEB-202610200200-I"
+            ],
+            "reported_integrity": "passed"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "EV-RST-WEB-202610051500"
+      ],
+      "environment": "production",
+      "last_verified_at": "2026-10-20T02:20:00Z"
+    },
+    {
+      "id": "app-erp",
+      "name": "Internal ERP",
+      "asset_type": "internal_app",
+      "criticality": "tier1",
+      "owner": "Business Applications",
+      "description": "Finance, purchasing and inventory management.",
+      "rto_minutes": 480,
+      "rpo_minutes": 240,
+      "depends_on": [
+        "db-orders",
+        "idp-core"
+      ],
+      "data_sensitivity": "confidential",
+      "backup": {
+        "schedule_minutes": 240,
+        "retention_days": 30,
+        "encrypted": true,
+        "recovery_points": [
+          {
+            "id": "RP-ERP-202610200800-P",
+            "created_at": "2026-10-20T08:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [],
+            "reported_integrity": "not_run"
+          },
+          {
+            "id": "RP-ERP-202610200400-P",
+            "created_at": "2026-10-20T04:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-ERP-202610200400-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-ERP-202610200000-P",
+            "created_at": "2026-10-20T00:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-ERP-202610200000-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-ERP-202609100000-P",
+            "created_at": "2026-09-10T00:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-ERP-202609100000-P"
+            ],
+            "reported_integrity": "passed"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "EV-RST-ERP-202609101600"
+      ],
+      "environment": "production",
+      "last_verified_at": "2026-10-20T04:20:00Z"
+    },
+    {
+      "id": "file-share",
+      "name": "Corporate File Storage",
+      "asset_type": "file_storage",
+      "criticality": "tier2",
+      "owner": "Workplace IT",
+      "description": "Department file shares (~4 TB).",
+      "rto_minutes": 1440,
+      "rpo_minutes": 1440,
+      "depends_on": [
+        "idp-core"
+      ],
+      "data_sensitivity": "confidential",
+      "backup": {
+        "schedule_minutes": 1440,
+        "retention_days": 30,
+        "encrypted": null,
+        "recovery_points": [
+          {
+            "id": "RP-FILES-202610200100-P",
+            "created_at": "2026-10-20T01:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-FILES-202610200100-P"
+            ],
+            "size_gb": 4096.0,
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-FILES-202610190100-P",
+            "created_at": "2026-10-19T01:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-FILES-202610190100-P"
+            ],
+            "size_gb": 4096.0,
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-FILES-202610180100-P",
+            "created_at": "2026-10-18T01:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-FILES-202610180100-P"
+            ],
+            "size_gb": 4096.0,
+            "reported_integrity": "passed"
+          }
+        ],
+        "restore_duration_minutes": 1800,
+        "restore_duration_basis": "estimated"
+      },
+      "environment": "production",
+      "evidence_refs": [],
+      "last_verified_at": "2026-10-20T01:20:00Z"
+    },
+    {
+      "id": "logging-siem",
+      "name": "Central Logging & SIEM",
+      "asset_type": "logging",
+      "criticality": "tier1",
+      "owner": "Security Operations",
+      "description": "Security event collection, detection rules and log archive.",
+      "rto_minutes": 240,
+      "rpo_minutes": 60,
+      "depends_on": [
+        "dns-core"
+      ],
+      "data_sensitivity": "confidential",
+      "backup": {
+        "schedule_minutes": 60,
+        "retention_days": 90,
+        "encrypted": true,
+        "recovery_points": [
+          {
+            "id": "RP-SIEM-202610200800-P",
+            "created_at": "2026-10-20T08:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-SIEM-202610200700-P",
+            "created_at": "2026-10-20T07:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-SIEM-202610200700-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-SIEM-202610200600-P",
+            "created_at": "2026-10-20T06:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-SIEM-202610200600-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-SIEM-202610200200-I",
+            "created_at": "2026-10-20T02:00:00Z",
+            "repository_id": "vault-isolated",
+            "evidence_ids": [
+              "EV-INT-SIEM-202610200200-I"
+            ],
+            "reported_integrity": "passed"
+          }
+        ]
+      },
+      "evidence_refs": [
+        "EV-RST-SIEM-202609201000"
+      ],
+      "environment": "production",
+      "last_verified_at": "2026-10-20T07:20:00Z"
+    },
+    {
+      "id": "monitoring",
+      "name": "Monitoring & Alerting",
+      "asset_type": "monitoring",
+      "criticality": "tier2",
+      "owner": "Site Reliability Engineering",
+      "description": "Metrics, dashboards and on-call alerting.",
+      "rto_minutes": 480,
+      "rpo_minutes": 1440,
+      "depends_on": [
+        "dns-core",
+        "idp-core"
+      ],
+      "data_sensitivity": "internal",
+      "backup": {
+        "schedule_minutes": 1440,
+        "retention_days": 14,
+        "encrypted": true,
+        "recovery_points": [
+          {
+            "id": "RP-MON-202610200000-P",
+            "created_at": "2026-10-20T00:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-MON-202610200000-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-MON-202610190000-P",
+            "created_at": "2026-10-19T00:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-MON-202610190000-P"
+            ],
+            "reported_integrity": "passed"
+          }
+        ],
+        "restore_duration_minutes": 60,
+        "restore_duration_basis": "estimated"
+      },
+      "environment": "production",
+      "evidence_refs": [],
+      "last_verified_at": "2026-10-20T00:20:00Z"
+    },
+    {
+      "id": "hr-portal",
+      "name": "HR Self-Service Portal",
+      "asset_type": "internal_app",
+      "criticality": "tier3",
+      "owner": "People Systems",
+      "description": "Leave requests and payslip downloads. RTO/RPO never agreed.",
+      "depends_on": [
+        "idp-core",
+        "file-share"
+      ],
+      "data_sensitivity": "restricted",
+      "backup": {
+        "schedule_minutes": 1440,
+        "retention_days": 30,
+        "encrypted": true,
+        "recovery_points": [
+          {
+            "id": "RP-HR-202610192300-P",
+            "created_at": "2026-10-19T23:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-HR-202610192300-P"
+            ],
+            "reported_integrity": "passed"
+          },
+          {
+            "id": "RP-HR-202610182300-P",
+            "created_at": "2026-10-18T23:00:00Z",
+            "repository_id": "vault-primary",
+            "evidence_ids": [
+              "EV-INT-HR-202610182300-P"
+            ],
+            "reported_integrity": "passed"
+          }
+        ]
+      },
+      "environment": "production",
+      "evidence_refs": [],
+      "last_verified_at": "2026-10-19T23:20:00Z"
+    },
+    {
+      "id": "aws-s3-exports",
+      "name": "Analytics Export Bucket (AWS S3)",
+      "asset_type": "cloud_resource",
+      "criticality": "tier3",
+      "owner": "Data Analytics",
+      "description": "Synthetic AWS-style resource: nightly analytics exports. No backup configured.",
+      "rto_minutes": 2880,
+      "rpo_minutes": 1440,
+      "data_sensitivity": "internal",
+      "environment": "production",
+      "depends_on": [],
+      "evidence_refs": []
+    },
+    {
+      "id": "vault-primary",
+      "name": "Primary Backup Vault",
+      "asset_type": "backup_repository",
+      "criticality": "tier0",
+      "environment": "shared",
+      "owner": "Infrastructure Operations",
+      "description": "Same-account backup vault receiving all scheduled backups.",
+      "data_sensitivity": "restricted",
+      "evidence_refs": [
+        "EV-ACC-PRIMARY"
+      ],
+      "repository": {
+        "separate_account": false,
+        "immutability": "governance",
+        "immutability_evidence_ids": [
+          "EV-IMM-PRIMARY"
+        ],
+        "delete_capable_roles": [
+          "backup-admin",
+          "platform-admin"
+        ],
+        "governance_bypass_roles": [
+          "backup-admin",
+          "platform-admin"
+        ]
+      },
+      "depends_on": []
+    },
+    {
+      "id": "vault-isolated",
+      "name": "Isolated Recovery Vault",
+      "asset_type": "backup_repository",
+      "criticality": "tier0",
+      "environment": "dr",
+      "owner": "Security Engineering",
+      "description": "Logically air-gapped copy in a dedicated recovery account (daily copies).",
+      "data_sensitivity": "restricted",
+      "repository": {
+        "separate_account": true,
+        "immutability": "compliance",
+        "immutability_evidence_ids": [
+          "EV-IMM-ISOLATED"
+        ],
+        "delete_capable_roles": [],
+        "governance_bypass_roles": []
+      },
+      "depends_on": [],
+      "evidence_refs": []
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EV-RST-DBCUS-202606151300",
+      "kind": "restore_test",
+      "asset_id": "db-customers",
+      "recovery_point_id": null,
+      "collected_at": "2026-06-15T13:00:00Z",
+      "source": "DR test runbook execution record (synthetic)",
+      "summary": "End-to-end restore into isolated test environment succeeded; application health checks passed. Measured duration 95 min.",
+      "result": "pass",
+      "measured_minutes": 95
+    },
+    {
+      "id": "EV-INT-KMS-202608290800-P",
+      "kind": "integrity_check",
+      "asset_id": "kms-secrets",
+      "recovery_point_id": "RP-KMS-202608290800-P",
+      "collected_at": "2026-08-29T08:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-KMS-202608290800-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-RST-KMS-202608301100",
+      "kind": "restore_test",
+      "asset_id": "kms-secrets",
+      "recovery_point_id": "RP-KMS-202608290800-P",
+      "collected_at": "2026-08-30T11:00:00Z",
+      "source": "DR test runbook execution record (synthetic)",
+      "summary": "End-to-end restore into isolated test environment succeeded; application health checks passed. Measured duration 25 min.",
+      "result": "pass",
+      "measured_minutes": 25
+    },
+    {
+      "id": "EV-INT-ERP-202609100000-P",
+      "kind": "integrity_check",
+      "asset_id": "app-erp",
+      "recovery_point_id": "RP-ERP-202609100000-P",
+      "collected_at": "2026-09-10T00:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-ERP-202609100000-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-RST-ERP-202609101600",
+      "kind": "restore_test",
+      "asset_id": "app-erp",
+      "recovery_point_id": "RP-ERP-202609100000-P",
+      "collected_at": "2026-09-10T16:00:00Z",
+      "source": "DR test runbook execution record (synthetic)",
+      "summary": "End-to-end restore into isolated test environment succeeded; application health checks passed. Measured duration 120 min.",
+      "result": "pass",
+      "measured_minutes": 120
+    },
+    {
+      "id": "EV-RST-SIEM-202609201000",
+      "kind": "restore_test",
+      "asset_id": "logging-siem",
+      "recovery_point_id": null,
+      "collected_at": "2026-09-20T10:00:00Z",
+      "source": "DR test runbook execution record (synthetic)",
+      "summary": "End-to-end restore into isolated test environment succeeded; application health checks passed. Measured duration 90 min.",
+      "result": "pass",
+      "measured_minutes": 90
+    },
+    {
+      "id": "EV-INT-IDP-202609270830-P",
+      "kind": "integrity_check",
+      "asset_id": "idp-core",
+      "recovery_point_id": "RP-IDP-202609270830-P",
+      "collected_at": "2026-09-27T08:50:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-IDP-202609270830-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-RST-IDP-202609281400",
+      "kind": "restore_test",
+      "asset_id": "idp-core",
+      "recovery_point_id": "RP-IDP-202609270830-P",
+      "collected_at": "2026-09-28T14:00:00Z",
+      "source": "DR test runbook execution record (synthetic)",
+      "summary": "End-to-end restore into isolated test environment succeeded; application health checks passed. Measured duration 45 min.",
+      "result": "pass",
+      "measured_minutes": 45
+    },
+    {
+      "id": "EV-INT-DNS-202610010200-P",
+      "kind": "integrity_check",
+      "asset_id": "dns-core",
+      "recovery_point_id": "RP-DNS-202610010200-P",
+      "collected_at": "2026-10-01T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DNS-202610010200-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-ACC-PRIMARY",
+      "kind": "access_review",
+      "asset_id": "vault-primary",
+      "collected_at": "2026-10-01T09:00:00Z",
+      "source": "Quarterly access review (synthetic)",
+      "summary": "Delete permission on primary vault held by: backup-admin, platform-admin. platform-admin access flagged as excessive but not yet removed.",
+      "result": "fail"
+    },
+    {
+      "id": "EV-RST-DNS-202610031000",
+      "kind": "restore_test",
+      "asset_id": "dns-core",
+      "recovery_point_id": "RP-DNS-202610010200-P",
+      "collected_at": "2026-10-03T10:00:00Z",
+      "source": "DR test runbook execution record (synthetic)",
+      "summary": "End-to-end restore into isolated test environment succeeded; application health checks passed. Measured duration 15 min.",
+      "result": "pass",
+      "measured_minutes": 15
+    },
+    {
+      "id": "EV-INT-ORDAPI-202610050200-P",
+      "kind": "integrity_check",
+      "asset_id": "app-orders-api",
+      "recovery_point_id": "RP-ORDAPI-202610050200-P",
+      "collected_at": "2026-10-05T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-ORDAPI-202610050200-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-WEB-202610050200-P",
+      "kind": "integrity_check",
+      "asset_id": "web-storefront",
+      "recovery_point_id": "RP-WEB-202610050200-P",
+      "collected_at": "2026-10-05T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-WEB-202610050200-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-RST-ORDAPI-202610051200",
+      "kind": "restore_test",
+      "asset_id": "app-orders-api",
+      "recovery_point_id": "RP-ORDAPI-202610050200-P",
+      "collected_at": "2026-10-05T12:00:00Z",
+      "source": "DR test runbook execution record (synthetic)",
+      "summary": "End-to-end restore into isolated test environment succeeded; application health checks passed. Measured duration 25 min.",
+      "result": "pass",
+      "measured_minutes": 25
+    },
+    {
+      "id": "EV-RST-WEB-202610051500",
+      "kind": "restore_test",
+      "asset_id": "web-storefront",
+      "recovery_point_id": "RP-WEB-202610050200-P",
+      "collected_at": "2026-10-05T15:00:00Z",
+      "source": "DR test runbook execution record (synthetic)",
+      "summary": "End-to-end restore into isolated test environment succeeded; application health checks passed. Measured duration 30 min.",
+      "result": "pass",
+      "measured_minutes": 30
+    },
+    {
+      "id": "EV-INT-DBORD-202610120200-P",
+      "kind": "integrity_check",
+      "asset_id": "db-orders",
+      "recovery_point_id": "RP-DBORD-202610120200-P",
+      "collected_at": "2026-10-12T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DBORD-202610120200-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-RST-DBORD-202610120900",
+      "kind": "restore_test",
+      "asset_id": "db-orders",
+      "recovery_point_id": "RP-DBORD-202610120200-P",
+      "collected_at": "2026-10-12T09:00:00Z",
+      "source": "DR test runbook execution record (synthetic)",
+      "summary": "End-to-end restore into isolated test environment succeeded; application health checks passed. Measured duration 75 min.",
+      "result": "pass",
+      "measured_minutes": 75
+    },
+    {
+      "id": "EV-IMM-PRIMARY",
+      "kind": "immutability_config",
+      "asset_id": "vault-primary",
+      "collected_at": "2026-10-15T09:00:00Z",
+      "source": "Vault lock configuration export (synthetic)",
+      "summary": "Vault lock in GOVERNANCE mode, 35-day minimum retention. Roles backup-admin and platform-admin hold the bypass-governance-retention permission.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-IMM-ISOLATED",
+      "kind": "immutability_config",
+      "asset_id": "vault-isolated",
+      "collected_at": "2026-10-15T09:30:00Z",
+      "source": "Vault lock configuration export (synthetic)",
+      "summary": "Vault lock in COMPLIANCE mode in a separate recovery account; 35-day retention cannot be shortened by any principal. No delete permissions granted.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-FILES-202610180100-P",
+      "kind": "integrity_check",
+      "asset_id": "file-share",
+      "recovery_point_id": "RP-FILES-202610180100-P",
+      "collected_at": "2026-10-18T01:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-FILES-202610180100-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-DNS-202610180200-P",
+      "kind": "integrity_check",
+      "asset_id": "dns-core",
+      "recovery_point_id": "RP-DNS-202610180200-P",
+      "collected_at": "2026-10-18T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DNS-202610180200-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-HR-202610182300-P",
+      "kind": "integrity_check",
+      "asset_id": "hr-portal",
+      "recovery_point_id": "RP-HR-202610182300-P",
+      "collected_at": "2026-10-18T23:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-HR-202610182300-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-MON-202610190000-P",
+      "kind": "integrity_check",
+      "asset_id": "monitoring",
+      "recovery_point_id": "RP-MON-202610190000-P",
+      "collected_at": "2026-10-19T00:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-MON-202610190000-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-FILES-202610190100-P",
+      "kind": "integrity_check",
+      "asset_id": "file-share",
+      "recovery_point_id": "RP-FILES-202610190100-P",
+      "collected_at": "2026-10-19T01:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-FILES-202610190100-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-DNS-202610190200-P",
+      "kind": "integrity_check",
+      "asset_id": "dns-core",
+      "recovery_point_id": "RP-DNS-202610190200-P",
+      "collected_at": "2026-10-19T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DNS-202610190200-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-ORDAPI-202610190200-P",
+      "kind": "integrity_check",
+      "asset_id": "app-orders-api",
+      "recovery_point_id": "RP-ORDAPI-202610190200-P",
+      "collected_at": "2026-10-19T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-ORDAPI-202610190200-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-WEB-202610190200-P",
+      "kind": "integrity_check",
+      "asset_id": "web-storefront",
+      "recovery_point_id": "RP-WEB-202610190200-P",
+      "collected_at": "2026-10-19T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-WEB-202610190200-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-DBORD-202610190645-P",
+      "kind": "integrity_check",
+      "asset_id": "db-orders",
+      "recovery_point_id": "RP-DBORD-202610190645-P",
+      "collected_at": "2026-10-19T07:05:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DBORD-202610190645-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-HR-202610192300-P",
+      "kind": "integrity_check",
+      "asset_id": "hr-portal",
+      "recovery_point_id": "RP-HR-202610192300-P",
+      "collected_at": "2026-10-19T23:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-HR-202610192300-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-ERP-202610200000-P",
+      "kind": "integrity_check",
+      "asset_id": "app-erp",
+      "recovery_point_id": "RP-ERP-202610200000-P",
+      "collected_at": "2026-10-20T00:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-ERP-202610200000-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-KMS-202610200000-I",
+      "kind": "integrity_check",
+      "asset_id": "kms-secrets",
+      "recovery_point_id": "RP-KMS-202610200000-I",
+      "collected_at": "2026-10-20T00:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-KMS-202610200000-I completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-KMS-202610200000-P",
+      "kind": "integrity_check",
+      "asset_id": "kms-secrets",
+      "recovery_point_id": "RP-KMS-202610200000-P",
+      "collected_at": "2026-10-20T00:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-KMS-202610200000-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-MON-202610200000-P",
+      "kind": "integrity_check",
+      "asset_id": "monitoring",
+      "recovery_point_id": "RP-MON-202610200000-P",
+      "collected_at": "2026-10-20T00:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-MON-202610200000-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-DBCUS-202610200100-I",
+      "kind": "integrity_check",
+      "asset_id": "db-customers",
+      "recovery_point_id": "RP-DBCUS-202610200100-I",
+      "collected_at": "2026-10-20T01:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DBCUS-202610200100-I completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-DBORD-202610200100-I",
+      "kind": "integrity_check",
+      "asset_id": "db-orders",
+      "recovery_point_id": "RP-DBORD-202610200100-I",
+      "collected_at": "2026-10-20T01:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DBORD-202610200100-I completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-FILES-202610200100-P",
+      "kind": "integrity_check",
+      "asset_id": "file-share",
+      "recovery_point_id": "RP-FILES-202610200100-P",
+      "collected_at": "2026-10-20T01:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-FILES-202610200100-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-IDP-202610200130-I",
+      "kind": "integrity_check",
+      "asset_id": "idp-core",
+      "recovery_point_id": "RP-IDP-202610200130-I",
+      "collected_at": "2026-10-20T01:50:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-IDP-202610200130-I completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-DNS-202610200200-I",
+      "kind": "integrity_check",
+      "asset_id": "dns-core",
+      "recovery_point_id": "RP-DNS-202610200200-I",
+      "collected_at": "2026-10-20T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DNS-202610200200-I completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-DNS-202610200200-P",
+      "kind": "integrity_check",
+      "asset_id": "dns-core",
+      "recovery_point_id": "RP-DNS-202610200200-P",
+      "collected_at": "2026-10-20T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DNS-202610200200-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-ORDAPI-202610200200-I",
+      "kind": "integrity_check",
+      "asset_id": "app-orders-api",
+      "recovery_point_id": "RP-ORDAPI-202610200200-I",
+      "collected_at": "2026-10-20T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-ORDAPI-202610200200-I completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-ORDAPI-202610200200-P",
+      "kind": "integrity_check",
+      "asset_id": "app-orders-api",
+      "recovery_point_id": "RP-ORDAPI-202610200200-P",
+      "collected_at": "2026-10-20T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-ORDAPI-202610200200-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-SIEM-202610200200-I",
+      "kind": "integrity_check",
+      "asset_id": "logging-siem",
+      "recovery_point_id": "RP-SIEM-202610200200-I",
+      "collected_at": "2026-10-20T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-SIEM-202610200200-I completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-WEB-202610200200-I",
+      "kind": "integrity_check",
+      "asset_id": "web-storefront",
+      "recovery_point_id": "RP-WEB-202610200200-I",
+      "collected_at": "2026-10-20T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-WEB-202610200200-I completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-WEB-202610200200-P",
+      "kind": "integrity_check",
+      "asset_id": "web-storefront",
+      "recovery_point_id": "RP-WEB-202610200200-P",
+      "collected_at": "2026-10-20T02:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-WEB-202610200200-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-ERP-202610200400-P",
+      "kind": "integrity_check",
+      "asset_id": "app-erp",
+      "recovery_point_id": "RP-ERP-202610200400-P",
+      "collected_at": "2026-10-20T04:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-ERP-202610200400-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-KMS-202610200400-P",
+      "kind": "integrity_check",
+      "asset_id": "kms-secrets",
+      "recovery_point_id": "RP-KMS-202610200400-P",
+      "collected_at": "2026-10-20T04:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-KMS-202610200400-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-DBCUS-202610200600-P",
+      "kind": "integrity_check",
+      "asset_id": "db-customers",
+      "recovery_point_id": "RP-DBCUS-202610200600-P",
+      "collected_at": "2026-10-20T06:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DBCUS-202610200600-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-SIEM-202610200600-P",
+      "kind": "integrity_check",
+      "asset_id": "logging-siem",
+      "recovery_point_id": "RP-SIEM-202610200600-P",
+      "collected_at": "2026-10-20T06:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-SIEM-202610200600-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-IDP-202610200630-P",
+      "kind": "integrity_check",
+      "asset_id": "idp-core",
+      "recovery_point_id": "RP-IDP-202610200630-P",
+      "collected_at": "2026-10-20T06:50:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-IDP-202610200630-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-DBCUS-202610200700-P",
+      "kind": "integrity_check",
+      "asset_id": "db-customers",
+      "recovery_point_id": "RP-DBCUS-202610200700-P",
+      "collected_at": "2026-10-20T07:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DBCUS-202610200700-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-SIEM-202610200700-P",
+      "kind": "integrity_check",
+      "asset_id": "logging-siem",
+      "recovery_point_id": "RP-SIEM-202610200700-P",
+      "collected_at": "2026-10-20T07:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-SIEM-202610200700-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-IDP-202610200730-P",
+      "kind": "integrity_check",
+      "asset_id": "idp-core",
+      "recovery_point_id": "RP-IDP-202610200730-P",
+      "collected_at": "2026-10-20T07:50:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-IDP-202610200730-P FAILED: checksum mismatch on 3 blocks.",
+      "result": "fail"
+    },
+    {
+      "id": "EV-INT-DBCUS-202610200800-P",
+      "kind": "integrity_check",
+      "asset_id": "db-customers",
+      "recovery_point_id": "RP-DBCUS-202610200800-P",
+      "collected_at": "2026-10-20T08:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DBCUS-202610200800-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-KMS-202610200800-P",
+      "kind": "integrity_check",
+      "asset_id": "kms-secrets",
+      "recovery_point_id": "RP-KMS-202610200800-P",
+      "collected_at": "2026-10-20T08:20:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-KMS-202610200800-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-DBORD-202610200815-P",
+      "kind": "integrity_check",
+      "asset_id": "db-orders",
+      "recovery_point_id": "RP-DBORD-202610200815-P",
+      "collected_at": "2026-10-20T08:35:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DBORD-202610200815-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-DBORD-202610200830-P",
+      "kind": "integrity_check",
+      "asset_id": "db-orders",
+      "recovery_point_id": "RP-DBORD-202610200830-P",
+      "collected_at": "2026-10-20T08:50:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DBORD-202610200830-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-IDP-202610200830-P",
+      "kind": "integrity_check",
+      "asset_id": "idp-core",
+      "recovery_point_id": "RP-IDP-202610200830-P",
+      "collected_at": "2026-10-20T08:50:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-IDP-202610200830-P completed: all blocks match.",
+      "result": "pass"
+    },
+    {
+      "id": "EV-INT-DBORD-202610200845-P",
+      "kind": "integrity_check",
+      "asset_id": "db-orders",
+      "recovery_point_id": "RP-DBORD-202610200845-P",
+      "collected_at": "2026-10-20T09:05:00Z",
+      "source": "Backup platform checksum verification export (synthetic)",
+      "summary": "Block-level checksum validation of RP-DBORD-202610200845-P completed: all blocks match.",
+      "result": "pass"
+    }
+  ]
+}

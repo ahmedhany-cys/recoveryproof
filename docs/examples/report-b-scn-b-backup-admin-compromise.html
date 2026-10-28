@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RecoveryProof report · Compromised backup administrator</title>
+<style>
+  :root { --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --navy:#0b1730; --accent:#2563eb;
+          --crit:#b91c1c; --high:#c2410c; --med:#a16207; --low:#15803d; --info:#475569; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--ink);
+         margin: 0; background: #fff; line-height: 1.45; font-size: 14px; }
+  header { background: var(--navy); color: #e2e8f0; padding: 28px 40px; }
+  header h1 { margin: 0 0 4px; font-size: 24px; color: #fff; }
+  header .tag { color: #93c5fd; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+  header .meta { margin-top: 10px; font-size: 12.5px; color: #cbd5e1; }
+  main { padding: 24px 40px 40px; max-width: 1100px; }
+  h2 { font-size: 17px; border-bottom: 2px solid var(--line); padding-bottom: 6px; margin-top: 30px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .kpi { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .kpi .v { font-size: 20px; font-weight: 700; }
+  .kpi .l { font-size: 12px; color: var(--muted); }
+  .kpi .n { font-size: 11px; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 8px; }
+  th { text-align: left; background: #f1f5f9; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .sev { font-weight: 700; text-transform: uppercase; font-size: 11px; }
+  .critical { color: var(--crit); } .high { color: var(--high); } .medium { color: var(--med); }
+  .low { color: var(--low); } .info { color: var(--info); }
+  .met { color: var(--low); font-weight: 600; } .breached { color: var(--crit); font-weight: 600; }
+  .unknown { color: var(--med); font-weight: 600; }
+  .note { color: var(--muted); font-size: 12px; }
+  .finding { border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px;
+             padding: 10px 12px; margin: 10px 0; page-break-inside: avoid; }
+  .finding.critical { border-left-color: var(--crit); } .finding.high { border-left-color: var(--high); }
+  .finding.medium { border-left-color: var(--med); } .finding.low { border-left-color: var(--low); }
+  .finding h3 { margin: 0 0 4px; font-size: 14px; }
+  .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11.5px; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  footer { color: var(--muted); font-size: 11.5px; border-top: 1px solid var(--line); padding: 14px 40px; }
+  @media print { header { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="tag">RecoveryProof · Disaster recovery readiness report</div>
+  <h1>Compromised backup administrator</h1>
+  <div class="meta">
+    Northwind Logistics (fictional) · Scenario <span class="mono">SCN-B-BACKUP-ADMIN-COMPROMISE</span> · Incident time 2026-10-20 09:00 UTC ·
+    Data as of 2026-10-20 09:00 UTC<br>
+    Data source: Bundled synthetic baseline · Analysis version 2026.10.1 · Generated 2026-10-28 07:09 UTC
+  </div>
+</header>
+<main>
+  <h2>1. Executive summary</h2>
+  <ul><li>Recovery readiness is 67.6/100 (Weak). 7 of 13 systems have evidence of a recent successful end-to-end restore test.</li><li>The recovery plan covers 13 system(s). Estimated time to restore: 2 h 50 min; 5 system(s) cannot be restored.</li><li>Potential data-loss exposure for systems being restored: 9 h; no usable recovery point for app-erp, aws-s3-exports, file-share, hr-portal, monitoring (loss not bounded).</li><li>8 critical and 17 high-severity findings were raised. 9 system(s) would lose more data than their RPO allows; 5 plan step(s) miss their RTO.</li><li>Blocked: app-erp, aws-s3-exports, file-share, hr-portal, monitoring. These cannot be restored with the current evidence and dependencies.</li></ul>
+  <div class="kpis">
+    <div class="kpi"><div class="l">Recovery readiness</div><div class="v">67.6 / 100</div><div class="n">Weak</div></div>
+    <div class="kpi"><div class="l">Restore-tested systems</div><div class="v">7 / 13</div><div class="n">evidence-backed end-to-end tests</div></div>
+    <div class="kpi"><div class="l">Stale or missing recovery points</div><div class="v">10</div><div class="n">RPO breached or no eligible point</div></div>
+    <div class="kpi"><div class="l">Integrity failures</div><div class="v">1</div><div class="n">recovery points failing verification</div></div>
+    <div class="kpi"><div class="l">Unmet RTO</div><div class="v">5</div><div class="n">1 unknown</div></div>
+    <div class="kpi"><div class="l">Unmet RPO</div><div class="v">9</div><div class="n">1 unknown</div></div>
+    <div class="kpi"><div class="l">Dependency failures</div><div class="v">0</div><div class="n">blocked by prerequisites, cycles or gaps</div></div>
+    <div class="kpi"><div class="l">Business capability impacted</div><div class="v">0%</div><div class="n">criticality-weighted</div></div>
+  </div>
+
+  <h2>2. Incident description</h2>
+  <p>At 07:40 UTC an attacker phishes the backup administrator and gains the &#39;backup-admin&#39; role. That role can bypass governance-mode retention on the primary vault. The attacker deletes the two newest ERP recovery points, then tries and fails to delete a database copy in the isolated vault. The intrusion is detected at 09:00. No production system is down yet, but leadership must know which systems would still be recoverable if the attacker followed up with ransomware.</p>
+  <table><tr><th>Time (UTC)</th><th>Injected condition (simulated)</th><th>Detail</th></tr>
+<tr><td>2026-10-20 07:40 UTC</td><td>Role &#39;backup-admin&#39; compromised</td><td>Attacker obtained an active session for the backup-admin role through phishing.</td></tr><tr><td>2026-10-20 08:10 UTC</td><td>RP-ERP-202610200400-P deleted</td><td>Deleted by &#39;backup-admin&#39;. Attacker deleted ERP recovery points using the governance-bypass permission.</td></tr><tr><td>2026-10-20 08:10 UTC</td><td>RP-ERP-202610200800-P deleted</td><td>Deleted by &#39;backup-admin&#39;. Attacker deleted ERP recovery points using the governance-bypass permission.</td></tr><tr><td>2026-10-20 08:15 UTC</td><td>Deletion of RP-DBORD-202610200100-I blocked</td><td>Attempt by &#39;backup-admin&#39;: role has no delete permission on the repository. Attacker attempted to delete the isolated copy of the orders database.</td></tr>  </table>
+
+  <h2>3. Assessment scope</h2>
+  <p>13 protected systems assessed against organisational recovery policy. Plan scope:
+    <strong>all protected systems (full-recovery rehearsal)</strong>.
+    Backup repositories are assessed as restore sources.</p>
+
+  <h2>4. Asset impact</h2>
+<p class="note">No systems are down in this scenario.</p>
+  <h2>5. Recovery readiness and RTO/RPO compliance</h2>
+  <table><tr><th>System</th><th>Tier</th><th>Recovery evidence</th><th>Selected recovery point</th>
+    <th>Data-loss exposure</th><th>RPO</th><th>Est. ready</th><th>RTO</th><th>Score</th></tr>
+  <tr><td>Core DNS &amp; Network Services</td><td>tier0</td><td>Restore-tested</td>
+      <td class="mono">RP-DNS-202610200200-I</td>
+      <td>7 h</td>
+      <td class="met">met <span class="note">(1 d)</span></td>
+      <td>T+15 min</td>
+      <td class="met">met <span class="note">(30 min)</span></td>
+      <td>100.0</td></tr>
+  <tr><td>Identity Provider &amp; SSO</td><td>tier0</td><td>Restore-tested</td>
+      <td class="mono">RP-IDP-202610200130-I</td>
+      <td>7 h 30 min</td>
+      <td class="breached">breached <span class="note">(1 h)</span></td>
+      <td>T+1 h</td>
+      <td class="met">met <span class="note">(1 h)</span></td>
+      <td>80.0</td></tr>
+  <tr><td>Secrets &amp; Key Management</td><td>tier0</td><td>Restore-tested</td>
+      <td class="mono">RP-KMS-202610200000-I</td>
+      <td>9 h</td>
+      <td class="breached">breached <span class="note">(4 h)</span></td>
+      <td>T+40 min</td>
+      <td class="met">met <span class="note">(45 min)</span></td>
+      <td>80.0</td></tr>
+  <tr><td>Orders Database (PostgreSQL)</td><td>tier0</td><td>Restore-tested</td>
+      <td class="mono">RP-DBORD-202610200100-I</td>
+      <td>8 h</td>
+      <td class="breached">breached <span class="note">(15 min)</span></td>
+      <td>T+1 h 55 min</td>
+      <td class="met">met <span class="note">(2 h)</span></td>
+      <td>80.0</td></tr>
+  <tr><td>Customer Database (PostgreSQL)</td><td>tier0</td><td>Integrity only</td>
+      <td class="mono">RP-DBCUS-202610200100-I</td>
+      <td>8 h</td>
+      <td class="breached">breached <span class="note">(1 h)</span></td>
+      <td>T+2 h 15 min</td>
+      <td class="breached">breached <span class="note">(2 h)</span></td>
+      <td>46.0</td></tr>
+  <tr><td>Orders API Service</td><td>tier0</td><td>Restore-tested</td>
+      <td class="mono">RP-ORDAPI-202610200200-I</td>
+      <td>7 h</td>
+      <td class="met">met <span class="note">(1 d)</span></td>
+      <td>T+2 h 20 min</td>
+      <td class="met">met <span class="note">(2 h 30 min)</span></td>
+      <td>100.0</td></tr>
+  <tr><td>Customer Storefront</td><td>tier0</td><td>Restore-tested</td>
+      <td class="mono">RP-WEB-202610200200-I</td>
+      <td>7 h</td>
+      <td class="met">met <span class="note">(1 d)</span></td>
+      <td>T+2 h 50 min</td>
+      <td class="met">met <span class="note">(3 h)</span></td>
+      <td>100.0</td></tr>
+  <tr><td>Internal ERP</td><td>tier1</td><td>No usable point</td>
+      <td class="mono">none eligible</td>
+      <td>not bounded</td>
+      <td class="breached">breached <span class="note">(4 h)</span></td>
+      <td>blocked</td>
+      <td class="breached">breached <span class="note">(8 h)</span></td>
+      <td>15.0</td></tr>
+  <tr><td>Corporate File Storage</td><td>tier2</td><td>No usable point</td>
+      <td class="mono">none eligible</td>
+      <td>not bounded</td>
+      <td class="breached">breached <span class="note">(1 d)</span></td>
+      <td>blocked</td>
+      <td class="breached">breached <span class="note">(1 d)</span></td>
+      <td>15.0</td></tr>
+  <tr><td>Central Logging &amp; SIEM</td><td>tier1</td><td>Restore-tested</td>
+      <td class="mono">RP-SIEM-202610200200-I</td>
+      <td>7 h</td>
+      <td class="breached">breached <span class="note">(1 h)</span></td>
+      <td>T+1 h 45 min</td>
+      <td class="met">met <span class="note">(4 h)</span></td>
+      <td>80.0</td></tr>
+  <tr><td>Monitoring &amp; Alerting</td><td>tier2</td><td>No usable point</td>
+      <td class="mono">none eligible</td>
+      <td>not bounded</td>
+      <td class="breached">breached <span class="note">(1 d)</span></td>
+      <td>blocked</td>
+      <td class="breached">breached <span class="note">(8 h)</span></td>
+      <td>15.0</td></tr>
+  <tr><td>HR Self-Service Portal</td><td>tier3</td><td>No usable point</td>
+      <td class="mono">none eligible</td>
+      <td>not bounded</td>
+      <td class="unknown">unknown <span class="note">(undocumented)</span></td>
+      <td>blocked</td>
+      <td class="unknown">unknown <span class="note">(undocumented)</span></td>
+      <td>0.0</td></tr>
+  <tr><td>Analytics Export Bucket (AWS S3)</td><td>tier3</td><td>No usable point</td>
+      <td class="mono">none eligible</td>
+      <td>not bounded</td>
+      <td class="breached">breached <span class="note">(1 d)</span></td>
+      <td>blocked</td>
+      <td class="breached">breached <span class="note">(2 d)</span></td>
+      <td>15.0</td></tr>
+</table>
+  <p class="note">Readiness score = criticality-weighted mean of per-system scores (backup confidence 35, RPO 20,
+    RTO in a full-recovery rehearsal 20, dependencies 15, isolation 10). Unknown values earn no credit.</p>
+
+  <h2>6. Recovery dependency order</h2>
+  <p>Estimated recovery time: <strong>2 h 50 min; 5 system(s) cannot be restored</strong> (serial, one at a time: 6 h 40 min).
+     Potential data-loss exposure: <strong>9 h; no usable recovery point for app-erp, aws-s3-exports, file-share, hr-portal, monitoring (loss not bounded)</strong>.</p>
+  <table><tr><th>#</th><th>Wave</th><th>System</th><th>Prerequisites</th><th>Recovery point</th><th>Start</th><th>Ready</th><th>Duration basis</th><th>RTO</th></tr>
+  <tr><td>1</td><td>1</td><td>Core DNS &amp; Network Services</td><td>–</td>
+      <td class="mono">RP-DNS-202610200200-I</td>
+<td>T+0 min</td><td>T+15 min</td><td>measured (EV-RST-DNS-202610031000)</td>      <td class="met">met</td></tr>
+  <tr><td>2</td><td>2</td><td>Secrets &amp; Key Management</td><td>dns-core</td>
+      <td class="mono">RP-KMS-202610200000-I</td>
+<td>T+15 min</td><td>T+40 min</td><td>measured (EV-RST-KMS-202608301100)</td>      <td class="met">met</td></tr>
+  <tr><td>3</td><td>2</td><td>Identity Provider &amp; SSO</td><td>dns-core</td>
+      <td class="mono">RP-IDP-202610200130-I</td>
+<td>T+15 min</td><td>T+1 h</td><td>measured (EV-RST-IDP-202609281400)</td>      <td class="met">met</td></tr>
+  <tr><td>4</td><td>3</td><td>Customer Database (PostgreSQL)</td><td>dns-core, kms-secrets</td>
+      <td class="mono">RP-DBCUS-202610200100-I</td>
+<td>T+40 min</td><td>T+2 h 15 min</td><td>measured (EV-RST-DBCUS-202606151300)</td>      <td class="breached">breached</td></tr>
+  <tr><td>5</td><td>3</td><td>Orders Database (PostgreSQL)</td><td>dns-core, kms-secrets</td>
+      <td class="mono">RP-DBORD-202610200100-I</td>
+<td>T+40 min</td><td>T+1 h 55 min</td><td>measured (EV-RST-DBORD-202610120900)</td>      <td class="met">met</td></tr>
+  <tr><td>6</td><td>4</td><td>Orders API Service</td><td>db-orders, idp-core, kms-secrets</td>
+      <td class="mono">RP-ORDAPI-202610200200-I</td>
+<td>T+1 h 55 min</td><td>T+2 h 20 min</td><td>measured (EV-RST-ORDAPI-202610051200)</td>      <td class="met">met</td></tr>
+  <tr><td>7</td><td>5</td><td>Customer Storefront</td><td>app-orders-api, db-customers, idp-core</td>
+      <td class="mono">RP-WEB-202610200200-I</td>
+<td>T+2 h 20 min</td><td>T+2 h 50 min</td><td>measured (EV-RST-WEB-202610051500)</td>      <td class="met">met</td></tr>
+  <tr><td>8</td><td>2</td><td>Central Logging &amp; SIEM</td><td>dns-core</td>
+      <td class="mono">RP-SIEM-202610200200-I</td>
+<td>T+15 min</td><td>T+1 h 45 min</td><td>measured (EV-RST-SIEM-202609201000)</td>      <td class="met">met</td></tr>
+  <tr><td>9</td><td>–</td><td>Internal ERP</td><td>db-orders, idp-core</td>
+      <td class="mono">–</td>
+<td colspan="3" class="breached">BLOCKED: no eligible recovery point</td>
+      <td class="breached">breached</td></tr>
+  <tr><td>10</td><td>–</td><td>Monitoring &amp; Alerting</td><td>dns-core, idp-core</td>
+      <td class="mono">–</td>
+<td colspan="3" class="breached">BLOCKED: no eligible recovery point</td>
+      <td class="breached">breached</td></tr>
+  <tr><td>11</td><td>–</td><td>Corporate File Storage</td><td>idp-core</td>
+      <td class="mono">–</td>
+<td colspan="3" class="breached">BLOCKED: no eligible recovery point</td>
+      <td class="breached">breached</td></tr>
+  <tr><td>12</td><td>–</td><td>Analytics Export Bucket (AWS S3)</td><td>–</td>
+      <td class="mono">–</td>
+<td colspan="3" class="breached">BLOCKED: no eligible recovery point</td>
+      <td class="breached">breached</td></tr>
+  <tr><td>13</td><td>–</td><td>HR Self-Service Portal</td><td>file-share, idp-core</td>
+      <td class="mono">–</td>
+<td colspan="3" class="breached">BLOCKED: no eligible recovery point</td>
+      <td class="unknown">unknown</td></tr>
+</table>
+  <ul class="note"><li>Recovery starts when the incident is declared (T+0). Detection, triage, forensic hold and decision time are not included in estimates.</li><li>The parallel estimate assumes unlimited restore capacity, so independent assets restore simultaneously; the serial estimate assumes one asset at a time. Reality lies between the two.</li><li>Restore durations come from the most recent passing restore test where one was measured; otherwise the documented estimate is used. Unknown durations are not guessed.</li><li>An asset may start restoring only after every prerequisite in the plan has finished.</li><li>Assets outside the plan scope are assumed to remain operational.</li></ul>
+
+  <h2>7. Findings and remediation recommendations</h2>
+  <div class="finding critical">
+    <h3><span class="sev critical">critical</span> · Recovery point objective breached — Customer Database (PostgreSQL)</h3>
+    <div class="note mono">F-RP-002-db-customers · rule RP-002 · basis: derived · priority 1</div>
+    <p>Newest eligible recovery point for Customer Database (PostgreSQL) is 8 h old at the time of the incident; RPO is 1 h.</p>
+<p class="note"><strong>Calculation:</strong> Incident 2026-10-20 09:00 UTC − eligible point RP-DBCUS-202610200100-I 2026-10-20 01:00 UTC = 8 h exposure; RPO 1 h; gap 7 h.</p>    <p><strong>Business impact:</strong> Tier 0 · Mission critical. 1 dependent system(s): Customer Storefront. Potential data loss of 8 h exceeds tolerance by 7 h.</p>
+    <p><strong>Recommended action:</strong> Correct the backup schedule or failing jobs so that the backup interval is shorter than the RPO, and alert on missed backups.<br>
+       <strong>Why:</strong> Restoring from the newest eligible point would lose more data than the business has agreed to tolerate.<br>
+       <strong>Verify by:</strong> Review backup job logs for the last 7 days and confirm a verified recovery point exists within the RPO window.<br>
+       <strong>Expected outcome:</strong> Data-loss exposure is at or below the RPO.</p>
+  </div>
+  <div class="finding critical">
+    <h3><span class="sev critical">critical</span> · Recovery point objective breached — Orders Database (PostgreSQL)</h3>
+    <div class="note mono">F-RP-002-db-orders · rule RP-002 · basis: derived · priority 2</div>
+    <p>Newest eligible recovery point for Orders Database (PostgreSQL) is 8 h old at the time of the incident; RPO is 15 min.</p>
+<p class="note"><strong>Calculation:</strong> Incident 2026-10-20 09:00 UTC − eligible point RP-DBORD-202610200100-I 2026-10-20 01:00 UTC = 8 h exposure; RPO 15 min; gap 7 h 45 min.</p>    <p><strong>Business impact:</strong> Tier 0 · Mission critical. 3 dependent system(s): Internal ERP, Orders API Service, Customer Storefront. Potential data loss of 8 h exceeds tolerance by 7 h 45 min.</p>
+    <p><strong>Recommended action:</strong> Correct the backup schedule or failing jobs so that the backup interval is shorter than the RPO, and alert on missed backups.<br>
+       <strong>Why:</strong> Restoring from the newest eligible point would lose more data than the business has agreed to tolerate.<br>
+       <strong>Verify by:</strong> Review backup job logs for the last 7 days and confirm a verified recovery point exists within the RPO window.<br>
+       <strong>Expected outcome:</strong> Data-loss exposure is at or below the RPO.</p>
+  </div>
+  <div class="finding critical">
+    <h3><span class="sev critical">critical</span> · Recovery point objective breached — Identity Provider &amp; SSO</h3>
+    <div class="note mono">F-RP-002-idp-core · rule RP-002 · basis: derived · priority 3</div>
+    <p>Newest eligible recovery point for Identity Provider &amp; SSO is 7 h 30 min old at the time of the incident; RPO is 1 h.</p>
+<p class="note"><strong>Calculation:</strong> Incident 2026-10-20 09:00 UTC − eligible point RP-IDP-202610200130-I 2026-10-20 01:30 UTC = 7 h 30 min exposure; RPO 1 h; gap 6 h 30 min.</p>    <p><strong>Business impact:</strong> Tier 0 · Mission critical. 6 dependent system(s): Internal ERP, Orders API Service, Corporate File Storage, HR Self-Service Portal, Monitoring &amp; Alerting, Customer Storefront. Potential data loss of 7 h 30 min exceeds tolerance by 6 h 30 min.</p>
+    <p><strong>Recommended action:</strong> Correct the backup schedule or failing jobs so that the backup interval is shorter than the RPO, and alert on missed backups.<br>
+       <strong>Why:</strong> Restoring from the newest eligible point would lose more data than the business has agreed to tolerate.<br>
+       <strong>Verify by:</strong> Review backup job logs for the last 7 days and confirm a verified recovery point exists within the RPO window.<br>
+       <strong>Expected outcome:</strong> Data-loss exposure is at or below the RPO.</p>
+  </div>
+  <div class="finding critical">
+    <h3><span class="sev critical">critical</span> · Recovery point objective breached — Secrets &amp; Key Management</h3>
+    <div class="note mono">F-RP-002-kms-secrets · rule RP-002 · basis: derived · priority 4</div>
+    <p>Newest eligible recovery point for Secrets &amp; Key Management is 9 h old at the time of the incident; RPO is 4 h.</p>
+<p class="note"><strong>Calculation:</strong> Incident 2026-10-20 09:00 UTC − eligible point RP-KMS-202610200000-I 2026-10-20 00:00 UTC = 9 h exposure; RPO 4 h; gap 5 h.</p>    <p><strong>Business impact:</strong> Tier 0 · Mission critical. 5 dependent system(s): Internal ERP, Orders API Service, Customer Database (PostgreSQL), Orders Database (PostgreSQL), Customer Storefront. Potential data loss of 9 h exceeds tolerance by 5 h.</p>
+    <p><strong>Recommended action:</strong> Correct the backup schedule or failing jobs so that the backup interval is shorter than the RPO, and alert on missed backups.<br>
+       <strong>Why:</strong> Restoring from the newest eligible point would lose more data than the business has agreed to tolerate.<br>
+       <strong>Verify by:</strong> Review backup job logs for the last 7 days and confirm a verified recovery point exists within the RPO window.<br>
+       <strong>Expected outcome:</strong> Data-loss exposure is at or below the RPO.</p>
+  </div>
+  <div class="finding critical">
+    <h3><span class="sev critical">critical</span> · Estimated recovery exceeds RTO — Customer Database (PostgreSQL)</h3>
+    <div class="note mono">F-RTO-001-db-customers · rule RTO-001 · basis: derived · priority 5</div>
+    <p>Customer Database (PostgreSQL) is estimated to be ready at T+2 h 15 min, beyond its RTO of 2 h.</p>
+<p class="note"><strong>Calculation:</strong> wait for prerequisites 40 min + restore 1 h 35 min (measured (EV-RST-DBCUS-202606151300)) = 2 h 15 min; RTO 2 h; over by 15 min.</p>    <p><strong>Business impact:</strong> Tier 0 · Mission critical. 1 dependent system(s): Customer Storefront.</p>
+    <p><strong>Recommended action:</strong> Shorten the recovery path: pre-stage restore infrastructure, parallelise dependency restores, or renegotiate the RTO with the business owner.<br>
+       <strong>Why:</strong> Missing the RTO extends business outage beyond the agreed tolerance.<br>
+       <strong>Verify by:</strong> Measure the restore duration in a test and recompute the recovery plan.<br>
+       <strong>Expected outcome:</strong> Estimated ready time is within the RTO.</p>
+  </div>
+  <div class="finding critical">
+    <h3><span class="sev critical">critical</span> · Compromised principal can delete or alter recovery points — Internal ERP</h3>
+    <div class="note mono">F-ACC-002-app-erp · rule ACC-002 · basis: simulated · priority 6</div>
+    <p>2 recovery point(s) for Internal ERP are reachable by compromised role(s) [backup-admin] without evidenced immutability: RP-ERP-202610200000-P, RP-ERP-202609100000-P. No protected recovery point remains.</p>
+    <p><strong>Business impact:</strong> Tier 1 · Business critical.</p>
+    <p><strong>Recommended action:</strong> Revoke the compromised role&#39;s sessions (manually, through the identity provider), then re-verify the integrity of every exposed recovery point.<br>
+       <strong>Why:</strong> Points the attacker could have altered cannot be trusted for restore.<br>
+       <strong>Verify by:</strong> Re-run integrity verification on exposed points from a trusted environment and review deletion events in the audit log.<br>
+       <strong>Expected outcome:</strong> Exposed points are re-verified or replaced by points in protected storage.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-ERP-202609100000-P, EV-INT-ERP-202610200000-P, EV-RST-ERP-202609101600</span></p>  </div>
+  <div class="finding critical">
+    <h3><span class="sev critical">critical</span> · No usable recovery point — Internal ERP</h3>
+    <div class="note mono">F-RP-001-app-erp · rule RP-001 · basis: simulated · priority 7</div>
+    <p>No eligible recovery point for Internal ERP. RP-ERP-202610200000-P: reachable by a compromised role without evidenced immutability (untrusted); RP-ERP-202609100000-P: reachable by a compromised role without evidenced immutability (untrusted).</p>
+    <p><strong>Business impact:</strong> Tier 1 · Business critical.</p>
+    <p><strong>Recommended action:</strong> Establish a working backup for this asset and produce at least one integrity-verified recovery point in an isolated repository.<br>
+       <strong>Why:</strong> Without an eligible recovery point the asset cannot be restored after loss.<br>
+       <strong>Verify by:</strong> Run a backup job, record a passing integrity check, and confirm the point appears as eligible in RecoveryProof.<br>
+       <strong>Expected outcome:</strong> Asset shows an eligible recovery point and RP-001 is no longer raised.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-ERP-202609100000-P, EV-INT-ERP-202610200000-P, EV-RST-ERP-202609101600</span></p>  </div>
+  <div class="finding critical">
+    <h3><span class="sev critical">critical</span> · Unrecoverable dependency blocks dependent systems — Corporate File Storage</h3>
+    <div class="note mono">F-DEP-003-file-share · rule DEP-003 · basis: simulated · priority 8</div>
+    <p>Corporate File Storage cannot be restored (no eligible recovery point). 1 dependent system(s) cannot return to service: hr-portal.</p>
+<p class="note"><strong>Calculation:</strong> Transitive dependents: 1; criticality-weighted impact: 1 (tier0=4, tier1=3, tier2=2, tier3=1).</p>    <p><strong>Business impact:</strong> Tier 2 · Important. 1 dependent system(s): HR Self-Service Portal.</p>
+    <p><strong>Recommended action:</strong> Restore or validate the critical dependency first (alternative recovery source, key recovery, or rebuild), then resume the dependent recovery.<br>
+       <strong>Why:</strong> Application recovery alone is insufficient when its prerequisites are lost.<br>
+       <strong>Verify by:</strong> Demonstrate a successful restore of the dependency in an isolated environment.<br>
+       <strong>Expected outcome:</strong> Dependency becomes restorable and dependents are unblocked.</p>
+  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · Unapproved roles can delete recovery points — Primary Backup Vault</h3>
+    <div class="note mono">F-ACC-001-vault-primary · rule ACC-001 · basis: verified · priority 9</div>
+    <p>Unapproved role(s) can delete recovery points in Primary Backup Vault: platform-admin. Approved: backup-admin.</p>
+    <p><strong>Business impact:</strong> Tier 0 · Mission critical.</p>
+    <p><strong>Recommended action:</strong> Reduce backup-administrator privileges: remove delete permissions from unapproved roles and require multi-party approval for deletion.<br>
+       <strong>Why:</strong> Every additional delete-capable role widens the blast radius of a credential compromise.<br>
+       <strong>Verify by:</strong> Perform an access review and record it as evidence.<br>
+       <strong>Expected outcome:</strong> Only approved roles can delete recovery points.</p>
+<p class="note">Evidence: <span class="mono">EV-ACC-PRIMARY</span></p>  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · Compromised principal can delete or alter recovery points — Orders API Service</h3>
+    <div class="note mono">F-ACC-002-app-orders-api · rule ACC-002 · basis: simulated · priority 10</div>
+    <p>3 recovery point(s) for Orders API Service are reachable by compromised role(s) [backup-admin] without evidenced immutability: RP-ORDAPI-202610200200-P, RP-ORDAPI-202610190200-P, RP-ORDAPI-202610050200-P. Newest protected eligible point: RP-ORDAPI-202610200200-I (2026-10-20 02:00 UTC).</p>
+    <p><strong>Business impact:</strong> Tier 0 · Mission critical. 1 dependent system(s): Customer Storefront.</p>
+    <p><strong>Recommended action:</strong> Revoke the compromised role&#39;s sessions (manually, through the identity provider), then re-verify the integrity of every exposed recovery point.<br>
+       <strong>Why:</strong> Points the attacker could have altered cannot be trusted for restore.<br>
+       <strong>Verify by:</strong> Re-run integrity verification on exposed points from a trusted environment and review deletion events in the audit log.<br>
+       <strong>Expected outcome:</strong> Exposed points are re-verified or replaced by points in protected storage.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-ORDAPI-202610050200-P, EV-INT-ORDAPI-202610190200-P, EV-INT-ORDAPI-202610200200-P, EV-RST-ORDAPI-202610051200</span></p>  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · Compromised principal can delete or alter recovery points — Customer Database (PostgreSQL)</h3>
+    <div class="note mono">F-ACC-002-db-customers · rule ACC-002 · basis: simulated · priority 11</div>
+    <p>3 recovery point(s) for Customer Database (PostgreSQL) are reachable by compromised role(s) [backup-admin] without evidenced immutability: RP-DBCUS-202610200800-P, RP-DBCUS-202610200700-P, RP-DBCUS-202610200600-P. Newest protected eligible point: RP-DBCUS-202610200100-I (2026-10-20 01:00 UTC).</p>
+    <p><strong>Business impact:</strong> Tier 0 · Mission critical. 1 dependent system(s): Customer Storefront.</p>
+    <p><strong>Recommended action:</strong> Revoke the compromised role&#39;s sessions (manually, through the identity provider), then re-verify the integrity of every exposed recovery point.<br>
+       <strong>Why:</strong> Points the attacker could have altered cannot be trusted for restore.<br>
+       <strong>Verify by:</strong> Re-run integrity verification on exposed points from a trusted environment and review deletion events in the audit log.<br>
+       <strong>Expected outcome:</strong> Exposed points are re-verified or replaced by points in protected storage.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-DBCUS-202610200600-P, EV-INT-DBCUS-202610200700-P, EV-INT-DBCUS-202610200800-P</span></p>  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · Compromised principal can delete or alter recovery points — Orders Database (PostgreSQL)</h3>
+    <div class="note mono">F-ACC-002-db-orders · rule ACC-002 · basis: simulated · priority 12</div>
+    <p>5 recovery point(s) for Orders Database (PostgreSQL) are reachable by compromised role(s) [backup-admin] without evidenced immutability: RP-DBORD-202610200845-P, RP-DBORD-202610200830-P, RP-DBORD-202610200815-P, RP-DBORD-202610190645-P, RP-DBORD-202610120200-P. Newest protected eligible point: RP-DBORD-202610200100-I (2026-10-20 01:00 UTC).</p>
+    <p><strong>Business impact:</strong> Tier 0 · Mission critical. 3 dependent system(s): Internal ERP, Orders API Service, Customer Storefront.</p>
+    <p><strong>Recommended action:</strong> Revoke the compromised role&#39;s sessions (manually, through the identity provider), then re-verify the integrity of every exposed recovery point.<br>
+       <strong>Why:</strong> Points the attacker could have altered cannot be trusted for restore.<br>
+       <strong>Verify by:</strong> Re-run integrity verification on exposed points from a trusted environment and review deletion events in the audit log.<br>
+       <strong>Expected outcome:</strong> Exposed points are re-verified or replaced by points in protected storage.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-DBORD-202610120200-P, EV-INT-DBORD-202610190645-P, EV-INT-DBORD-202610200815-P, EV-INT-DBORD-202610200830-P, EV-INT-DBORD-202610200845-P, EV-RST-DBORD-202610120900</span></p>  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · Compromised principal can delete or alter recovery points — Core DNS &amp; Network Services</h3>
+    <div class="note mono">F-ACC-002-dns-core · rule ACC-002 · basis: simulated · priority 13</div>
+    <p>4 recovery point(s) for Core DNS &amp; Network Services are reachable by compromised role(s) [backup-admin] without evidenced immutability: RP-DNS-202610200200-P, RP-DNS-202610190200-P, RP-DNS-202610180200-P, RP-DNS-202610010200-P. Newest protected eligible point: RP-DNS-202610200200-I (2026-10-20 02:00 UTC).</p>
+    <p><strong>Business impact:</strong> Tier 0 · Mission critical. 11 dependent system(s): Internal ERP, Orders API Service, Customer Database (PostgreSQL), Orders Database (PostgreSQL), Corporate File Storage, HR Self-Service Portal ….</p>
+    <p><strong>Recommended action:</strong> Revoke the compromised role&#39;s sessions (manually, through the identity provider), then re-verify the integrity of every exposed recovery point.<br>
+       <strong>Why:</strong> Points the attacker could have altered cannot be trusted for restore.<br>
+       <strong>Verify by:</strong> Re-run integrity verification on exposed points from a trusted environment and review deletion events in the audit log.<br>
+       <strong>Expected outcome:</strong> Exposed points are re-verified or replaced by points in protected storage.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-DNS-202610010200-P, EV-INT-DNS-202610180200-P, EV-INT-DNS-202610190200-P, EV-INT-DNS-202610200200-P, EV-RST-DNS-202610031000</span></p>  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · Compromised principal can delete or alter recovery points — Identity Provider &amp; SSO</h3>
+    <div class="note mono">F-ACC-002-idp-core · rule ACC-002 · basis: simulated · priority 14</div>
+    <p>4 recovery point(s) for Identity Provider &amp; SSO are reachable by compromised role(s) [backup-admin] without evidenced immutability: RP-IDP-202610200830-P, RP-IDP-202610200730-P, RP-IDP-202610200630-P, RP-IDP-202609270830-P. Newest protected eligible point: RP-IDP-202610200130-I (2026-10-20 01:30 UTC).</p>
+    <p><strong>Business impact:</strong> Tier 0 · Mission critical. 6 dependent system(s): Internal ERP, Orders API Service, Corporate File Storage, HR Self-Service Portal, Monitoring &amp; Alerting, Customer Storefront.</p>
+    <p><strong>Recommended action:</strong> Revoke the compromised role&#39;s sessions (manually, through the identity provider), then re-verify the integrity of every exposed recovery point.<br>
+       <strong>Why:</strong> Points the attacker could have altered cannot be trusted for restore.<br>
+       <strong>Verify by:</strong> Re-run integrity verification on exposed points from a trusted environment and review deletion events in the audit log.<br>
+       <strong>Expected outcome:</strong> Exposed points are re-verified or replaced by points in protected storage.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-IDP-202609270830-P, EV-INT-IDP-202610200630-P, EV-INT-IDP-202610200730-P, EV-INT-IDP-202610200830-P, EV-RST-IDP-202609281400</span></p>  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · Compromised principal can delete or alter recovery points — Secrets &amp; Key Management</h3>
+    <div class="note mono">F-ACC-002-kms-secrets · rule ACC-002 · basis: simulated · priority 15</div>
+    <p>4 recovery point(s) for Secrets &amp; Key Management are reachable by compromised role(s) [backup-admin] without evidenced immutability: RP-KMS-202610200800-P, RP-KMS-202610200400-P, RP-KMS-202610200000-P, RP-KMS-202608290800-P. Newest protected eligible point: RP-KMS-202610200000-I (2026-10-20 00:00 UTC).</p>
+    <p><strong>Business impact:</strong> Tier 0 · Mission critical. 5 dependent system(s): Internal ERP, Orders API Service, Customer Database (PostgreSQL), Orders Database (PostgreSQL), Customer Storefront.</p>
+    <p><strong>Recommended action:</strong> Revoke the compromised role&#39;s sessions (manually, through the identity provider), then re-verify the integrity of every exposed recovery point.<br>
+       <strong>Why:</strong> Points the attacker could have altered cannot be trusted for restore.<br>
+       <strong>Verify by:</strong> Re-run integrity verification on exposed points from a trusted environment and review deletion events in the audit log.<br>
+       <strong>Expected outcome:</strong> Exposed points are re-verified or replaced by points in protected storage.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-KMS-202608290800-P, EV-INT-KMS-202610200000-P, EV-INT-KMS-202610200400-P, EV-INT-KMS-202610200800-P, EV-RST-KMS-202608301100</span></p>  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · Compromised principal can delete or alter recovery points — Customer Storefront</h3>
+    <div class="note mono">F-ACC-002-web-storefront · rule ACC-002 · basis: simulated · priority 16</div>
+    <p>3 recovery point(s) for Customer Storefront are reachable by compromised role(s) [backup-admin] without evidenced immutability: RP-WEB-202610200200-P, RP-WEB-202610190200-P, RP-WEB-202610050200-P. Newest protected eligible point: RP-WEB-202610200200-I (2026-10-20 02:00 UTC).</p>
+    <p><strong>Business impact:</strong> Tier 0 · Mission critical.</p>
+    <p><strong>Recommended action:</strong> Revoke the compromised role&#39;s sessions (manually, through the identity provider), then re-verify the integrity of every exposed recovery point.<br>
+       <strong>Why:</strong> Points the attacker could have altered cannot be trusted for restore.<br>
+       <strong>Verify by:</strong> Re-run integrity verification on exposed points from a trusted environment and review deletion events in the audit log.<br>
+       <strong>Expected outcome:</strong> Exposed points are re-verified or replaced by points in protected storage.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-WEB-202610050200-P, EV-INT-WEB-202610190200-P, EV-INT-WEB-202610200200-P, EV-RST-WEB-202610051500</span></p>  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · Contradictory evidence — Identity Provider &amp; SSO</h3>
+    <div class="note mono">F-EV-002-idp-core-RP-IDP-202610200730-P · rule EV-002 · basis: verified · priority 17</div>
+    <p>RP-IDP-202610200730-P: reported integrity check status contradicts evidence; treated as &#39;failed&#39;.</p>
+    <p><strong>Business impact:</strong> Tier 0 · Mission critical. 6 dependent system(s): Internal ERP, Orders API Service, Corporate File Storage, HR Self-Service Portal, Monitoring &amp; Alerting, Customer Storefront.</p>
+    <p><strong>Recommended action:</strong> Investigate the contradiction between the backup platform and the evidence store; re-run verification.<br>
+       <strong>Why:</strong> Contradictions may indicate tampering, tooling faults or reporting errors.<br>
+       <strong>Verify by:</strong> Re-verify the recovery point and confirm reported status and evidence agree.<br>
+       <strong>Expected outcome:</strong> Reported status and evidence agree.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-IDP-202610200730-P</span></p>  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · No recent end-to-end restore test — Customer Database (PostgreSQL)</h3>
+    <div class="note mono">F-RP-005-db-customers · rule RP-005 · basis: verified · priority 18</div>
+    <p>No passing end-to-end restore test within 90 days for Customer Database (PostgreSQL) (last passing test 2026-06-15 13:00 UTC, 126 days before assessment).</p>
+    <p><strong>Business impact:</strong> Tier 0 · Mission critical. 1 dependent system(s): Customer Storefront.</p>
+    <p><strong>Recommended action:</strong> Schedule and perform an end-to-end restore test into an isolated environment, including application-level validation.<br>
+       <strong>Why:</strong> Untested restores frequently fail on missing dependencies, keys, or runbook gaps.<br>
+       <strong>Verify by:</strong> Record the restore test result and measured duration as evidence.<br>
+       <strong>Expected outcome:</strong> Asset recovery evidence becomes &#39;Restore-tested&#39; with a measured duration.</p>
+<p class="note">Evidence: <span class="mono">EV-RST-DBCUS-202606151300</span></p>  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · Compromised principal can delete or alter recovery points — Central Logging &amp; SIEM</h3>
+    <div class="note mono">F-ACC-002-logging-siem · rule ACC-002 · basis: simulated · priority 19</div>
+    <p>3 recovery point(s) for Central Logging &amp; SIEM are reachable by compromised role(s) [backup-admin] without evidenced immutability: RP-SIEM-202610200800-P, RP-SIEM-202610200700-P, RP-SIEM-202610200600-P. Newest protected eligible point: RP-SIEM-202610200200-I (2026-10-20 02:00 UTC).</p>
+    <p><strong>Business impact:</strong> Tier 1 · Business critical.</p>
+    <p><strong>Recommended action:</strong> Revoke the compromised role&#39;s sessions (manually, through the identity provider), then re-verify the integrity of every exposed recovery point.<br>
+       <strong>Why:</strong> Points the attacker could have altered cannot be trusted for restore.<br>
+       <strong>Verify by:</strong> Re-run integrity verification on exposed points from a trusted environment and review deletion events in the audit log.<br>
+       <strong>Expected outcome:</strong> Exposed points are re-verified or replaced by points in protected storage.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-SIEM-202610200600-P, EV-INT-SIEM-202610200700-P</span></p>  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · No verified isolated recovery copy — Internal ERP</h3>
+    <div class="note mono">F-ISO-001-app-erp · rule ISO-001 · basis: verified · priority 20</div>
+    <p>Tier 1 · Business critical assets require an isolated, immutable copy; isolation status is &#39;none&#39;.</p>
+    <p><strong>Business impact:</strong> Tier 1 · Business critical.</p>
+    <p><strong>Recommended action:</strong> Create an isolated backup copy in a separate account/tenant with compliance-mode immutability.<br>
+       <strong>Why:</strong> Ransomware operators routinely target backups reachable from production credentials.<br>
+       <strong>Verify by:</strong> Confirm a recovery point exists in the isolated repository and that its immutability configuration is evidenced.<br>
+       <strong>Expected outcome:</strong> Isolation status becomes &#39;verified&#39;.</p>
+  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · Recovery point objective breached — Central Logging &amp; SIEM</h3>
+    <div class="note mono">F-RP-002-logging-siem · rule RP-002 · basis: derived · priority 21</div>
+    <p>Newest eligible recovery point for Central Logging &amp; SIEM is 7 h old at the time of the incident; RPO is 1 h.</p>
+<p class="note"><strong>Calculation:</strong> Incident 2026-10-20 09:00 UTC − eligible point RP-SIEM-202610200200-I 2026-10-20 02:00 UTC = 7 h exposure; RPO 1 h; gap 6 h.</p>    <p><strong>Business impact:</strong> Tier 1 · Business critical. Potential data loss of 7 h exceeds tolerance by 6 h.</p>
+    <p><strong>Recommended action:</strong> Correct the backup schedule or failing jobs so that the backup interval is shorter than the RPO, and alert on missed backups.<br>
+       <strong>Why:</strong> Restoring from the newest eligible point would lose more data than the business has agreed to tolerate.<br>
+       <strong>Verify by:</strong> Review backup job logs for the last 7 days and confirm a verified recovery point exists within the RPO window.<br>
+       <strong>Expected outcome:</strong> Data-loss exposure is at or below the RPO.</p>
+  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · Compromised principal can delete or alter recovery points — Corporate File Storage</h3>
+    <div class="note mono">F-ACC-002-file-share · rule ACC-002 · basis: simulated · priority 22</div>
+    <p>3 recovery point(s) for Corporate File Storage are reachable by compromised role(s) [backup-admin] without evidenced immutability: RP-FILES-202610200100-P, RP-FILES-202610190100-P, RP-FILES-202610180100-P. No protected recovery point remains.</p>
+    <p><strong>Business impact:</strong> Tier 2 · Important. 1 dependent system(s): HR Self-Service Portal.</p>
+    <p><strong>Recommended action:</strong> Revoke the compromised role&#39;s sessions (manually, through the identity provider), then re-verify the integrity of every exposed recovery point.<br>
+       <strong>Why:</strong> Points the attacker could have altered cannot be trusted for restore.<br>
+       <strong>Verify by:</strong> Re-run integrity verification on exposed points from a trusted environment and review deletion events in the audit log.<br>
+       <strong>Expected outcome:</strong> Exposed points are re-verified or replaced by points in protected storage.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-FILES-202610180100-P, EV-INT-FILES-202610190100-P, EV-INT-FILES-202610200100-P</span></p>  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · Compromised principal can delete or alter recovery points — Monitoring &amp; Alerting</h3>
+    <div class="note mono">F-ACC-002-monitoring · rule ACC-002 · basis: simulated · priority 23</div>
+    <p>2 recovery point(s) for Monitoring &amp; Alerting are reachable by compromised role(s) [backup-admin] without evidenced immutability: RP-MON-202610200000-P, RP-MON-202610190000-P. No protected recovery point remains.</p>
+    <p><strong>Business impact:</strong> Tier 2 · Important.</p>
+    <p><strong>Recommended action:</strong> Revoke the compromised role&#39;s sessions (manually, through the identity provider), then re-verify the integrity of every exposed recovery point.<br>
+       <strong>Why:</strong> Points the attacker could have altered cannot be trusted for restore.<br>
+       <strong>Verify by:</strong> Re-run integrity verification on exposed points from a trusted environment and review deletion events in the audit log.<br>
+       <strong>Expected outcome:</strong> Exposed points are re-verified or replaced by points in protected storage.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-MON-202610190000-P, EV-INT-MON-202610200000-P</span></p>  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · No usable recovery point — Corporate File Storage</h3>
+    <div class="note mono">F-RP-001-file-share · rule RP-001 · basis: simulated · priority 24</div>
+    <p>No eligible recovery point for Corporate File Storage. RP-FILES-202610200100-P: reachable by a compromised role without evidenced immutability (untrusted); RP-FILES-202610190100-P: reachable by a compromised role without evidenced immutability (untrusted); RP-FILES-202610180100-P: reachable by a compromised role without evidenced immutability (untrusted).</p>
+    <p><strong>Business impact:</strong> Tier 2 · Important. 1 dependent system(s): HR Self-Service Portal.</p>
+    <p><strong>Recommended action:</strong> Establish a working backup for this asset and produce at least one integrity-verified recovery point in an isolated repository.<br>
+       <strong>Why:</strong> Without an eligible recovery point the asset cannot be restored after loss.<br>
+       <strong>Verify by:</strong> Run a backup job, record a passing integrity check, and confirm the point appears as eligible in RecoveryProof.<br>
+       <strong>Expected outcome:</strong> Asset shows an eligible recovery point and RP-001 is no longer raised.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-FILES-202610180100-P, EV-INT-FILES-202610190100-P, EV-INT-FILES-202610200100-P</span></p>  </div>
+  <div class="finding high">
+    <h3><span class="sev high">high</span> · No usable recovery point — Monitoring &amp; Alerting</h3>
+    <div class="note mono">F-RP-001-monitoring · rule RP-001 · basis: simulated · priority 25</div>
+    <p>No eligible recovery point for Monitoring &amp; Alerting. RP-MON-202610200000-P: reachable by a compromised role without evidenced immutability (untrusted); RP-MON-202610190000-P: reachable by a compromised role without evidenced immutability (untrusted).</p>
+    <p><strong>Business impact:</strong> Tier 2 · Important.</p>
+    <p><strong>Recommended action:</strong> Establish a working backup for this asset and produce at least one integrity-verified recovery point in an isolated repository.<br>
+       <strong>Why:</strong> Without an eligible recovery point the asset cannot be restored after loss.<br>
+       <strong>Verify by:</strong> Run a backup job, record a passing integrity check, and confirm the point appears as eligible in RecoveryProof.<br>
+       <strong>Expected outcome:</strong> Asset shows an eligible recovery point and RP-001 is no longer raised.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-MON-202610190000-P, EV-INT-MON-202610200000-P</span></p>  </div>
+  <div class="finding medium">
+    <h3><span class="sev medium">medium</span> · Retention lock can be bypassed by privileged roles — Primary Backup Vault</h3>
+    <div class="note mono">F-ISO-003-vault-primary · rule ISO-003 · basis: verified · priority 26</div>
+    <p>Governance-mode retention on Primary Backup Vault can be bypassed by: backup-admin, platform-admin.</p>
+    <p><strong>Business impact:</strong> Tier 0 · Mission critical.</p>
+    <p><strong>Recommended action:</strong> Move critical recovery points to compliance-mode retention or remove bypass permissions from day-to-day administrator roles.<br>
+       <strong>Why:</strong> A compromised administrator could delete &#39;immutable&#39; backups.<br>
+       <strong>Verify by:</strong> Review the repository policy and confirm bypass permissions are restricted to a break-glass role.<br>
+       <strong>Expected outcome:</strong> No standing role can bypass retention.</p>
+<p class="note">Evidence: <span class="mono">EV-IMM-PRIMARY</span></p>  </div>
+  <div class="finding medium">
+    <h3><span class="sev medium">medium</span> · Retention below policy minimum — Customer Database (PostgreSQL)</h3>
+    <div class="note mono">F-RET-001-db-customers · rule RET-001 · basis: verified · priority 27</div>
+    <p>Retention is 14 days; policy minimum for tier0 is 35 days.</p>
+<p class="note"><strong>Calculation:</strong> 14 d &lt; 35 d required</p>    <p><strong>Business impact:</strong> Tier 0 · Mission critical. 1 dependent system(s): Customer Storefront.</p>
+    <p><strong>Recommended action:</strong> Improve recovery-point retention to meet the policy minimum.<br>
+       <strong>Why:</strong> Short retention can leave only compromised points available after a long dwell time.<br>
+       <strong>Verify by:</strong> Confirm the retention setting and the oldest available recovery point.<br>
+       <strong>Expected outcome:</strong> Retention meets policy minimum.</p>
+  </div>
+  <div class="finding medium">
+    <h3><span class="sev medium">medium</span> · Status claimed without supporting evidence — Central Logging &amp; SIEM</h3>
+    <div class="note mono">F-EV-001-logging-siem-RP-SIEM-202610200800-P · rule EV-001 · basis: unknown · priority 28</div>
+    <p>RP-SIEM-202610200800-P: backup platform reports the integrity check as passed, but no evidence record supports it.</p>
+    <p><strong>Business impact:</strong> Tier 1 · Business critical.</p>
+    <p><strong>Recommended action:</strong> Investigate missing backup evidence and ensure verification results are exported to the evidence store.<br>
+       <strong>Why:</strong> Unsupported claims cannot be audited and may hide failed or skipped checks.<br>
+       <strong>Verify by:</strong> Locate or regenerate the evidence record and link it to the recovery point.<br>
+       <strong>Expected outcome:</strong> Claim is backed by an evidence record.</p>
+  </div>
+  <div class="finding medium">
+    <h3><span class="sev medium">medium</span> · Newest recovery point integrity not verified — Central Logging &amp; SIEM</h3>
+    <div class="note mono">F-RP-004-logging-siem · rule RP-004 · basis: unknown · priority 29</div>
+    <p>Newest recovery point RP-SIEM-202610200800-P (2026-10-20 08:00 UTC) has integrity status &#39;unknown&#39; and is not counted as recoverable.</p>
+    <p><strong>Business impact:</strong> Tier 1 · Business critical.</p>
+    <p><strong>Recommended action:</strong> Enable automated integrity verification (checksum/test mount) on every recovery point and store the results as evidence.<br>
+       <strong>Why:</strong> Backup existence is not proof of recoverability; unverified points cannot be relied on during an incident.<br>
+       <strong>Verify by:</strong> Confirm an integrity-check evidence record with result &#39;pass&#39; exists for the newest point.<br>
+       <strong>Expected outcome:</strong> Newest point is integrity-verified and selected for recovery.</p>
+  </div>
+  <div class="finding medium">
+    <h3><span class="sev medium">medium</span> · No recent end-to-end restore test — Corporate File Storage</h3>
+    <div class="note mono">F-RP-005-file-share · rule RP-005 · basis: unknown · priority 30</div>
+    <p>No passing end-to-end restore test within 90 days for Corporate File Storage (no passing restore test on record).</p>
+    <p><strong>Business impact:</strong> Tier 2 · Important. 1 dependent system(s): HR Self-Service Portal.</p>
+    <p><strong>Recommended action:</strong> Schedule and perform an end-to-end restore test into an isolated environment, including application-level validation.<br>
+       <strong>Why:</strong> Untested restores frequently fail on missing dependencies, keys, or runbook gaps.<br>
+       <strong>Verify by:</strong> Record the restore test result and measured duration as evidence.<br>
+       <strong>Expected outcome:</strong> Asset recovery evidence becomes &#39;Restore-tested&#39; with a measured duration.</p>
+  </div>
+  <div class="finding medium">
+    <h3><span class="sev medium">medium</span> · No recent end-to-end restore test — Monitoring &amp; Alerting</h3>
+    <div class="note mono">F-RP-005-monitoring · rule RP-005 · basis: unknown · priority 31</div>
+    <p>No passing end-to-end restore test within 90 days for Monitoring &amp; Alerting (no passing restore test on record).</p>
+    <p><strong>Business impact:</strong> Tier 2 · Important.</p>
+    <p><strong>Recommended action:</strong> Schedule and perform an end-to-end restore test into an isolated environment, including application-level validation.<br>
+       <strong>Why:</strong> Untested restores frequently fail on missing dependencies, keys, or runbook gaps.<br>
+       <strong>Verify by:</strong> Record the restore test result and measured duration as evidence.<br>
+       <strong>Expected outcome:</strong> Asset recovery evidence becomes &#39;Restore-tested&#39; with a measured duration.</p>
+  </div>
+  <div class="finding medium">
+    <h3><span class="sev medium">medium</span> · Compromised principal can delete or alter recovery points — HR Self-Service Portal</h3>
+    <div class="note mono">F-ACC-002-hr-portal · rule ACC-002 · basis: simulated · priority 32</div>
+    <p>2 recovery point(s) for HR Self-Service Portal are reachable by compromised role(s) [backup-admin] without evidenced immutability: RP-HR-202610192300-P, RP-HR-202610182300-P. No protected recovery point remains.</p>
+    <p><strong>Business impact:</strong> Tier 3 · Supporting.</p>
+    <p><strong>Recommended action:</strong> Revoke the compromised role&#39;s sessions (manually, through the identity provider), then re-verify the integrity of every exposed recovery point.<br>
+       <strong>Why:</strong> Points the attacker could have altered cannot be trusted for restore.<br>
+       <strong>Verify by:</strong> Re-run integrity verification on exposed points from a trusted environment and review deletion events in the audit log.<br>
+       <strong>Expected outcome:</strong> Exposed points are re-verified or replaced by points in protected storage.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-HR-202610182300-P, EV-INT-HR-202610192300-P</span></p>  </div>
+  <div class="finding medium">
+    <h3><span class="sev medium">medium</span> · No usable recovery point — Analytics Export Bucket (AWS S3)</h3>
+    <div class="note mono">F-RP-001-aws-s3-exports · rule RP-001 · basis: unknown · priority 33</div>
+    <p>Analytics Export Bucket (AWS S3) has no backup policy and no recovery points.</p>
+    <p><strong>Business impact:</strong> Tier 3 · Supporting.</p>
+    <p><strong>Recommended action:</strong> Establish a working backup for this asset and produce at least one integrity-verified recovery point in an isolated repository.<br>
+       <strong>Why:</strong> Without an eligible recovery point the asset cannot be restored after loss.<br>
+       <strong>Verify by:</strong> Run a backup job, record a passing integrity check, and confirm the point appears as eligible in RecoveryProof.<br>
+       <strong>Expected outcome:</strong> Asset shows an eligible recovery point and RP-001 is no longer raised.</p>
+  </div>
+  <div class="finding medium">
+    <h3><span class="sev medium">medium</span> · No usable recovery point — HR Self-Service Portal</h3>
+    <div class="note mono">F-RP-001-hr-portal · rule RP-001 · basis: simulated · priority 34</div>
+    <p>No eligible recovery point for HR Self-Service Portal. RP-HR-202610192300-P: reachable by a compromised role without evidenced immutability (untrusted); RP-HR-202610182300-P: reachable by a compromised role without evidenced immutability (untrusted).</p>
+    <p><strong>Business impact:</strong> Tier 3 · Supporting.</p>
+    <p><strong>Recommended action:</strong> Establish a working backup for this asset and produce at least one integrity-verified recovery point in an isolated repository.<br>
+       <strong>Why:</strong> Without an eligible recovery point the asset cannot be restored after loss.<br>
+       <strong>Verify by:</strong> Run a backup job, record a passing integrity check, and confirm the point appears as eligible in RecoveryProof.<br>
+       <strong>Expected outcome:</strong> Asset shows an eligible recovery point and RP-001 is no longer raised.</p>
+<p class="note">Evidence: <span class="mono">EV-INT-HR-202610182300-P, EV-INT-HR-202610192300-P</span></p>  </div>
+  <div class="finding low">
+    <h3><span class="sev low">low</span> · Backup encryption absent or undocumented — Corporate File Storage</h3>
+    <div class="note mono">F-ENC-001-file-share · rule ENC-001 · basis: unknown · priority 35</div>
+    <p>Backup encryption is not documented for confidential data.</p>
+    <p><strong>Business impact:</strong> Tier 2 · Important. 1 dependent system(s): HR Self-Service Portal.</p>
+    <p><strong>Recommended action:</strong> Enable encryption at rest for backups using a managed key with restricted access, and document the configuration.<br>
+       <strong>Why:</strong> Unencrypted backups of sensitive data create a data-exposure risk if the repository is accessed.<br>
+       <strong>Verify by:</strong> Record an encryption-configuration evidence record.<br>
+       <strong>Expected outcome:</strong> Backup encryption is enabled and evidenced.</p>
+  </div>
+  <div class="finding low">
+    <h3><span class="sev low">low</span> · No recent end-to-end restore test — HR Self-Service Portal</h3>
+    <div class="note mono">F-RP-005-hr-portal · rule RP-005 · basis: unknown · priority 36</div>
+    <p>No passing end-to-end restore test within 90 days for HR Self-Service Portal (no passing restore test on record).</p>
+    <p><strong>Business impact:</strong> Tier 3 · Supporting.</p>
+    <p><strong>Recommended action:</strong> Schedule and perform an end-to-end restore test into an isolated environment, including application-level validation.<br>
+       <strong>Why:</strong> Untested restores frequently fail on missing dependencies, keys, or runbook gaps.<br>
+       <strong>Verify by:</strong> Record the restore test result and measured duration as evidence.<br>
+       <strong>Expected outcome:</strong> Asset recovery evidence becomes &#39;Restore-tested&#39; with a measured duration.</p>
+  </div>
+  <div class="finding low">
+    <h3><span class="sev low">low</span> · RTO or RPO not documented — HR Self-Service Portal</h3>
+    <div class="note mono">F-RTO-002-hr-portal · rule RTO-002 · basis: unknown · priority 37</div>
+    <p>RTO and RPO not documented for HR Self-Service Portal.</p>
+    <p><strong>Business impact:</strong> Tier 3 · Supporting.</p>
+    <p><strong>Recommended action:</strong> Document a missing RTO and RPO with the business owner.<br>
+       <strong>Why:</strong> Without objectives, recovery cannot be prioritised or tested against a target.<br>
+       <strong>Verify by:</strong> Confirm RTO and RPO values are recorded in the inventory.<br>
+       <strong>Expected outcome:</strong> RTO/RPO compliance can be evaluated.</p>
+  </div>
+  <div class="finding low">
+    <h3><span class="sev low">low</span> · Restore duration unknown — HR Self-Service Portal</h3>
+    <div class="note mono">F-RTO-003-hr-portal · rule RTO-003 · basis: unknown · priority 38</div>
+    <p>No measured or estimated restore duration for HR Self-Service Portal.</p>
+    <p><strong>Business impact:</strong> Tier 3 · Supporting.</p>
+    <p><strong>Recommended action:</strong> Perform a restore test to measure the restore duration.<br>
+       <strong>Why:</strong> Unknown durations make the overall recovery estimate incomplete.<br>
+       <strong>Verify by:</strong> Record a restore test with a measured duration.<br>
+       <strong>Expected outcome:</strong> Restore duration is measured.</p>
+  </div>
+
+  <h2>8. Evidence references</h2>
+  <p class="note">47 evidence record(s) are cited by findings. Each ID resolves to a record in the
+    Evidence Explorer and in the JSON export.</p>
+  <p class="mono">EV-ACC-PRIMARY, EV-IMM-PRIMARY, EV-INT-DBCUS-202610200600-P, EV-INT-DBCUS-202610200700-P, EV-INT-DBCUS-202610200800-P, EV-INT-DBORD-202610120200-P, EV-INT-DBORD-202610190645-P, EV-INT-DBORD-202610200815-P, EV-INT-DBORD-202610200830-P, EV-INT-DBORD-202610200845-P, EV-INT-DNS-202610010200-P, EV-INT-DNS-202610180200-P, EV-INT-DNS-202610190200-P, EV-INT-DNS-202610200200-P, EV-INT-ERP-202609100000-P, EV-INT-ERP-202610200000-P, EV-INT-FILES-202610180100-P, EV-INT-FILES-202610190100-P, EV-INT-FILES-202610200100-P, EV-INT-HR-202610182300-P, EV-INT-HR-202610192300-P, EV-INT-IDP-202609270830-P, EV-INT-IDP-202610200630-P, EV-INT-IDP-202610200730-P, EV-INT-IDP-202610200830-P, EV-INT-KMS-202608290800-P, EV-INT-KMS-202610200000-P, EV-INT-KMS-202610200400-P, EV-INT-KMS-202610200800-P, EV-INT-MON-202610190000-P, EV-INT-MON-202610200000-P, EV-INT-ORDAPI-202610050200-P, EV-INT-ORDAPI-202610190200-P, EV-INT-ORDAPI-202610200200-P, EV-INT-SIEM-202610200600-P, EV-INT-SIEM-202610200700-P, EV-INT-WEB-202610050200-P, EV-INT-WEB-202610190200-P, EV-INT-WEB-202610200200-P, EV-RST-DBCUS-202606151300, EV-RST-DBORD-202610120900, EV-RST-DNS-202610031000, EV-RST-ERP-202609101600, EV-RST-IDP-202609281400, EV-RST-KMS-202608301100, EV-RST-ORDAPI-202610051200, EV-RST-WEB-202610051500</p>
+
+  <h2>9. Unverified assumptions</h2>
+  <ul><li>Analytics Export Bucket (AWS S3): restore duration unknown.</li><li>Corporate File Storage: restore duration 1 d 6 h is an estimate, not a measurement.</li><li>HR Self-Service Portal: RTO/RPO undocumented; compliance not assessed.</li><li>HR Self-Service Portal: restore duration unknown.</li><li>Monitoring &amp; Alerting: restore duration 1 h is an estimate, not a measurement.</li><li>All infrastructure, backup and evidence data in this analysis is synthetic unless the data source states otherwise.</li><li>A recovery point counts as recoverable only when an evidence record shows a passing integrity check; reported status without evidence is treated as unknown.</li><li>Restore-tested means a passing end-to-end restore test exists within the policy window; it validates the procedure, not every individual recovery point.</li><li>Unknown values earn no score credit and are reported as &#39;Unknown&#39; rather than assumed.</li><li>Data-loss exposure is the time between the incident and the newest eligible recovery point; transactions in flight and replication lag are not modelled.</li><li>All timestamps are UTC.</li></ul>
+
+  <h2>10. Limitations and confidence</h2>
+  <p>Moderate confidence: 7/13 systems have restore-tested evidence; 1 RPO and 1 RTO values could not be evaluated. Report generated 2026-10-28 07:09 UTC from analysis version 2026.10.1.</p>
+  <ul><li>RecoveryProof is a decision-support tool. It does not perform, guarantee or replace tested enterprise backup and recovery.</li><li>Conclusions are only as good as the evidence supplied; missing evidence is reported as unknown, never as success.</li><li>Time estimates exclude detection, triage, forensic preservation and business validation, and assume restore capacity as stated in the plan assumptions.</li><li>The local audit trail is tamper-evident (hash-chained), not tamper-proof.</li></ul>
+</main>
+<footer>
+  Generated by RecoveryProof 2026.10.1 on 2026-10-28 07:09 UTC. Every figure in this report is derived from
+  the analysis result for scenario SCN-B-BACKUP-ADMIN-COMPROMISE and agrees with the dashboard and JSON export.
+</footer>
+</body>
+</html>

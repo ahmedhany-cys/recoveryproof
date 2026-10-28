@@ -1,0 +1,54 @@
+{
+  "id": "SCN-F-RANSOMWARE-DWELL-TIME",
+  "code": "F",
+  "title": "Ransomware after 6-hour dwell time",
+  "category": "Ransomware",
+  "severity": "critical",
+  "variation_of": "SCN-A-RANSOMWARE-INTACT",
+  "narrative": "Same encryption event as Scenario A. Forensics show the attacker had persistent access from 03:00 UTC. Any recovery point taken after 03:00 may contain attacker persistence, so it cannot be trusted. Recovery must use points from before the cutoff.",
+  "incident_at": "2026-10-20T09:00:00Z",
+  "trusted_before": "2026-10-20T03:00:00Z",
+  "plan_scope": "affected",
+  "injections": [
+    {
+      "type": "compromise_assets",
+      "at": "2026-10-20T08:52:00Z",
+      "asset_ids": [
+        "web-storefront",
+        "app-orders-api",
+        "db-orders",
+        "db-customers",
+        "app-erp",
+        "file-share"
+      ],
+      "description": "Ransomware encrypted six production systems after a six-hour dwell period."
+    }
+  ],
+  "recommended_actions": [
+    "Restore only from points before 03:00 UTC",
+    "Hunt for persistence before reconnecting systems"
+  ],
+  "expected": {
+    "readiness_max": 80,
+    "blocked_assets": [],
+    "rto_breaches": [
+      "file-share"
+    ],
+    "rpo_breaches": [
+      "app-erp",
+      "aws-s3-exports",
+      "db-customers",
+      "db-orders",
+      "idp-core",
+      "kms-secrets",
+      "logging-siem"
+    ],
+    "required_rules": [
+      "RP-002"
+    ],
+    "selected_points": {
+      "db-orders": "RP-DBORD-202610200100-I",
+      "app-erp": "RP-ERP-202610200000-P"
+    }
+  }
+}

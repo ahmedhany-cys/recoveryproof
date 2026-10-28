@@ -1,0 +1,52 @@
+{
+  "id": "SCN-J-INSIDER-FILE-BACKUP-DELETION",
+  "code": "J",
+  "title": "Insider deletes file-share backups",
+  "category": "Insider threat",
+  "severity": "high",
+  "variation_of": "SCN-B-BACKUP-ADMIN-COMPROMISE",
+  "narrative": "A departing engineer uses a standing platform-admin role at 06:00 UTC to delete all file-share recovery points, which have no isolated copy. At 08:30 UTC the engineer wipes the file share. The HR portal relies on the file share and is affected too.",
+  "incident_at": "2026-10-20T09:00:00Z",
+  "plan_scope": "affected",
+  "injections": [
+    {
+      "type": "delete_recovery_points",
+      "at": "2026-10-20T06:00:00Z",
+      "actor": "platform-admin",
+      "recovery_point_ids": [
+        "RP-FILES-202610200100-P",
+        "RP-FILES-202610190100-P",
+        "RP-FILES-202610180100-P"
+      ],
+      "description": "Recovery points deleted using governance-bypass permission held by platform-admin."
+    },
+    {
+      "type": "compromise_assets",
+      "at": "2026-10-20T08:30:00Z",
+      "asset_ids": [
+        "file-share"
+      ],
+      "description": "File share contents wiped."
+    }
+  ],
+  "recommended_actions": [
+    "Remove delete rights from platform-admin",
+    "Create an isolated copy of the file share"
+  ],
+  "expected": {
+    "blocked_assets": [
+      "file-share"
+    ],
+    "rto_breaches": [
+      "file-share"
+    ],
+    "required_rules": [
+      "DEP-003",
+      "ACC-001",
+      "RP-001"
+    ],
+    "selected_points": {
+      "file-share": null
+    }
+  }
+}

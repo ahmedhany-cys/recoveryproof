@@ -1,0 +1,52 @@
+{
+  "id": "SCN-E-CORRUPTED-NEWEST-POINT",
+  "code": "E",
+  "title": "Corrupted newest recovery point",
+  "category": "Backup integrity",
+  "severity": "high",
+  "narrative": "At 08:55 UTC the customer database volume is encrypted by ransomware. Before restoring, the recovery team re-runs integrity verification on the newest recovery point (08:00). It fails with checksum mismatches. RecoveryProof must find the newest point that is still eligible and recalculate the plan and data-loss exposure.",
+  "incident_at": "2026-10-20T09:00:00Z",
+  "plan_scope": "affected",
+  "injections": [
+    {
+      "type": "compromise_assets",
+      "at": "2026-10-20T08:55:00Z",
+      "asset_ids": [
+        "db-customers"
+      ],
+      "description": "Customer database volume encrypted."
+    },
+    {
+      "type": "corrupt_recovery_points",
+      "at": "2026-10-20T08:58:00Z",
+      "recovery_point_ids": [
+        "RP-DBCUS-202610200800-P"
+      ],
+      "description": "Pre-restore integrity verification found checksum mismatches in 3 blocks."
+    }
+  ],
+  "recommended_actions": [
+    "Restore from the newest verified earlier point",
+    "Quarantine the corrupted point and investigate possible tampering",
+    "Tell the business how much extra data was lost"
+  ],
+  "expected": {
+    "readiness_min": 75,
+    "readiness_max": 85,
+    "blocked_assets": [],
+    "rto_breaches": [],
+    "rpo_breaches": [
+      "app-erp",
+      "aws-s3-exports",
+      "db-customers",
+      "logging-siem"
+    ],
+    "required_rules": [
+      "RP-003",
+      "RP-002"
+    ],
+    "selected_points": {
+      "db-customers": "RP-DBCUS-202610200700-P"
+    }
+  }
+}

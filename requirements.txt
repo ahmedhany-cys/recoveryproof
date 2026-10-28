@@ -1,0 +1,8 @@
+# Runtime dependencies (ranges). For an exact, tested set see requirements-lock.txt.
+pydantic>=2.9,<3
+networkx>=3.3,<4
+pandas>=2.2,<3
+plotly>=5.24,<7
+streamlit>=1.40,<2
+jinja2>=3.1.4,<4
+fpdf2>=2.8,<3

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RecoveryProof report · {{ r.scenario_title }}</title>
+<style>
+  :root { --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --navy:#0b1730; --accent:#2563eb;
+          --crit:#b91c1c; --high:#c2410c; --med:#a16207; --low:#15803d; --info:#475569; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--ink);
+         margin: 0; background: #fff; line-height: 1.45; font-size: 14px; }
+  header { background: var(--navy); color: #e2e8f0; padding: 28px 40px; }
+  header h1 { margin: 0 0 4px; font-size: 24px; color: #fff; }
+  header .tag { color: #93c5fd; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+  header .meta { margin-top: 10px; font-size: 12.5px; color: #cbd5e1; }
+  main { padding: 24px 40px 40px; max-width: 1100px; }
+  h2 { font-size: 17px; border-bottom: 2px solid var(--line); padding-bottom: 6px; margin-top: 30px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .kpi { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .kpi .v { font-size: 20px; font-weight: 700; }
+  .kpi .l { font-size: 12px; color: var(--muted); }
+  .kpi .n { font-size: 11px; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 8px; }
+  th { text-align: left; background: #f1f5f9; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .sev { font-weight: 700; text-transform: uppercase; font-size: 11px; }
+  .critical { color: var(--crit); } .high { color: var(--high); } .medium { color: var(--med); }
+  .low { color: var(--low); } .info { color: var(--info); }
+  .met { color: var(--low); font-weight: 600; } .breached { color: var(--crit); font-weight: 600; }
+  .unknown { color: var(--med); font-weight: 600; }
+  .note { color: var(--muted); font-size: 12px; }
+  .finding { border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px;
+             padding: 10px 12px; margin: 10px 0; page-break-inside: avoid; }
+  .finding.critical { border-left-color: var(--crit); } .finding.high { border-left-color: var(--high); }
+  .finding.medium { border-left-color: var(--med); } .finding.low { border-left-color: var(--low); }
+  .finding h3 { margin: 0 0 4px; font-size: 14px; }
+  .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11.5px; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  footer { color: var(--muted); font-size: 11.5px; border-top: 1px solid var(--line); padding: 14px 40px; }
+  @media print { header { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="tag">RecoveryProof · Disaster recovery readiness report</div>
+  <h1>{{ r.scenario_title }}</h1>
+  <div class="meta">
+    {{ r.organization }} · Scenario <span class="mono">{{ r.scenario_id }}</span> · Incident time {{ r.incident_at|ts }} ·
+    Data as of {{ r.as_of|ts }}<br>
+    Data source: {{ r.data_source }} · Analysis version {{ r.analysis_version }} · Generated {{ r.generated_at|ts }}
+  </div>
+</header>
+<main>
+  <h2>1. Executive summary</h2>
+  <ul>{% for line in summary %}<li>{{ line }}</li>{% endfor %}</ul>
+  <div class="kpis">
+    {% for k in kpis %}
+    <div class="kpi"><div class="l">{{ k.label }}</div><div class="v">{{ k.value }}</div><div class="n">{{ k.note }}</div></div>
+    {% endfor %}
+  </div>
+
+  <h2>2. Incident description</h2>
+  <p>{{ r.scenario_narrative }}</p>
+  {% set injections = r.timeline | selectattr("kind", "equalto", "injection") | list %}
+  {% if injections %}
+  <table><tr><th>Time (UTC)</th><th>Injected condition (simulated)</th><th>Detail</th></tr>
+  {% for e in injections %}<tr><td>{{ e.at|ts }}</td><td>{{ e.title }}</td><td>{{ e.detail }}</td></tr>{% endfor %}
+  </table>
+  {% endif %}
+
+  <h2>3. Assessment scope</h2>
+  <p>{{ r.assets|length }} protected systems assessed against organisational recovery policy. Plan scope:
+    <strong>{{ "all protected systems (full-recovery rehearsal)" if r.plan.scope == "all" else "systems taken down by the incident" }}</strong>.
+    Backup repositories are assessed as restore sources.</p>
+
+  <h2>4. Asset impact</h2>
+  {% if impacted %}
+  <table><tr><th>System</th><th>Tier</th><th>State</th><th>Being restored</th><th>Blocked</th></tr>
+  {% for a in impacted %}
+  <tr><td>{{ a.name }}</td><td>{{ a.criticality.value }}</td><td>{{ a.state.value }}</td>
+      <td>{{ "yes" if a.in_plan_scope else "no (dependency impact)" }}</td>
+      <td>{{ a.blocked_reasons|join("; ") if a.restore_blocked else "no" }}</td></tr>
+  {% endfor %}</table>
+  {% else %}<p class="note">No systems are down in this scenario.</p>{% endif %}
+
+  <h2>5. Recovery readiness and RTO/RPO compliance</h2>
+  <table><tr><th>System</th><th>Tier</th><th>Recovery evidence</th><th>Selected recovery point</th>
+    <th>Data-loss exposure</th><th>RPO</th><th>Est. ready</th><th>RTO</th><th>Score</th></tr>
+  {% for a in r.assets %}
+  <tr><td>{{ a.name }}</td><td>{{ a.criticality.value }}</td><td>{{ a.recovery_evidence.label }}</td>
+      <td class="mono">{{ a.selected_point_id or "none eligible" }}</td>
+      <td>{{ a.data_loss_minutes|mins("not bounded") }}</td>
+      <td class="{{ a.rpo_status.value }}">{{ a.rpo_status.value.replace("_", " ") }} <span class="note">({{ a.rpo_minutes|mins("undocumented") }})</span></td>
+      <td>{{ ("T+" ~ (a.estimated_ready_minute|mins)) if a.estimated_ready_minute is not none else ("blocked" if a.restore_blocked else "n/a") }}</td>
+      <td class="{{ a.rto_status.value }}">{{ a.rto_status.value.replace("_", " ") }} <span class="note">({{ a.rto_minutes|mins("undocumented") }})</span></td>
+      <td>{{ a.score }}</td></tr>
+  {% endfor %}</table>
+  <p class="note">Readiness score = criticality-weighted mean of per-system scores (backup confidence 35, RPO 20,
+    RTO in a full-recovery rehearsal 20, dependencies 15, isolation 10). Unknown values earn no credit.</p>
+
+  <h2>6. Recovery dependency order</h2>
+  <p>Estimated recovery time: <strong>{{ estimate }}</strong>{% if r.plan.serial_minutes is not none %} (serial, one at a time: {{ r.plan.serial_minutes|mins }}){% endif %}.
+     Potential data-loss exposure: <strong>{{ data_loss }}</strong>.</p>
+  <table><tr><th>#</th><th>Wave</th><th>System</th><th>Prerequisites</th><th>Recovery point</th><th>Start</th><th>Ready</th><th>Duration basis</th><th>RTO</th></tr>
+  {% for s in r.plan.steps %}
+  <tr><td>{{ s.order }}</td><td>{{ s.wave or "–" }}</td><td>{{ s.name }}</td><td>{{ s.depends_on|join(", ") or "–" }}</td>
+      <td class="mono">{{ s.recovery_point_id or "–" }}</td>
+      {% if s.blocked %}<td colspan="3" class="breached">BLOCKED: {{ s.blocked_reason }}</td>
+      {% else %}<td>T+{{ s.start_minute|mins }}</td><td>T+{{ s.finish_minute|mins }}</td><td>{{ s.duration_basis or "unknown" }}</td>{% endif %}
+      <td class="{{ s.rto_status.value }}">{{ s.rto_status.value }}</td></tr>
+  {% endfor %}</table>
+  <ul class="note">{% for a in r.plan.assumptions %}<li>{{ a }}</li>{% endfor %}</ul>
+
+  <h2>7. Findings and remediation recommendations</h2>
+  {% for rec in r.recommendations %}
+  {% set f = r.finding(rec.finding_id) %}
+  <div class="finding {{ f.severity.value }}">
+    <h3><span class="sev {{ f.severity.value }}">{{ f.severity.value }}</span> · {{ f.title }} — {{ f.asset_name }}</h3>
+    <div class="note mono">{{ f.id }} · rule {{ f.rule_id }} · basis: {{ f.basis.value }} · priority {{ rec.priority }}</div>
+    <p>{{ f.description }}</p>
+    {% if f.calculation %}<p class="note"><strong>Calculation:</strong> {{ f.calculation }}</p>{% endif %}
+    <p><strong>Business impact:</strong> {{ f.business_impact }}</p>
+    <p><strong>Recommended action:</strong> {{ rec.action }}<br>
+       <strong>Why:</strong> {{ rec.reason }}<br>
+       <strong>Verify by:</strong> {{ rec.verification_procedure }}<br>
+       <strong>Expected outcome:</strong> {{ rec.expected_outcome }}</p>
+    {% if f.evidence_ids %}<p class="note">Evidence: <span class="mono">{{ f.evidence_ids|join(", ") }}</span></p>{% endif %}
+  </div>
+  {% else %}<p>No findings.</p>{% endfor %}
+
+  <h2>8. Evidence references</h2>
+  <p class="note">{{ evidence_ids|length }} evidence record(s) are cited by findings. Each ID resolves to a record in the
+    Evidence Explorer and in the JSON export.</p>
+  <p class="mono">{{ evidence_ids|join(", ") or "none" }}</p>
+
+  <h2>9. Unverified assumptions</h2>
+  <ul>{% for u in unverified %}<li>{{ u }}</li>{% else %}<li>None identified.</li>{% endfor %}
+  {% for a in r.assumptions %}<li>{{ a }}</li>{% endfor %}</ul>
+
+  <h2>10. Limitations and confidence</h2>
+  <p>{{ confidence }}</p>
+  <ul>{% for l in limitations %}<li>{{ l }}</li>{% endfor %}</ul>
+</main>
+<footer>
+  Generated by RecoveryProof {{ r.analysis_version }} on {{ r.generated_at|ts }}. Every figure in this report is derived from
+  the analysis result for scenario {{ r.scenario_id }} and agrees with the dashboard and JSON export.
+</footer>
+</body>
+</html>

@@ -1,0 +1,75 @@
+{
+  "id": "SCN-I-FULL-SITE-LOSS",
+  "code": "I",
+  "title": "Full production site loss",
+  "category": "Infrastructure failure",
+  "severity": "critical",
+  "variation_of": "SCN-G-PRIMARY-VAULT-OUTAGE",
+  "narrative": "At 07:30 UTC a regional outage takes down every production system and the primary backup vault with them. Everything must be rebuilt from the isolated recovery vault in the recovery account.",
+  "incident_at": "2026-10-20T09:00:00Z",
+  "plan_scope": "all",
+  "injections": [
+    {
+      "type": "repository_outage",
+      "at": "2026-10-20T07:30:00Z",
+      "repository_id": "vault-primary",
+      "description": "Primary vault lost with the production region."
+    },
+    {
+      "type": "compromise_assets",
+      "at": "2026-10-20T07:30:00Z",
+      "asset_ids": [
+        "dns-core",
+        "idp-core",
+        "kms-secrets",
+        "db-orders",
+        "db-customers",
+        "app-orders-api",
+        "web-storefront",
+        "app-erp",
+        "file-share",
+        "logging-siem",
+        "monitoring",
+        "hr-portal",
+        "aws-s3-exports"
+      ],
+      "description": "All production workloads unavailable."
+    }
+  ],
+  "recommended_actions": [
+    "Rebuild in the recovery region in dependency order",
+    "Add isolated copies for systems that have none"
+  ],
+  "expected": {
+    "readiness_max": 70,
+    "blocked_assets": [
+      "app-erp",
+      "aws-s3-exports",
+      "file-share",
+      "hr-portal",
+      "monitoring"
+    ],
+    "required_rules": [
+      "REPO-001",
+      "RP-001"
+    ],
+    "order_constraints": [
+      [
+        "dns-core",
+        "kms-secrets"
+      ],
+      [
+        "kms-secrets",
+        "db-orders"
+      ],
+      [
+        "db-orders",
+        "app-orders-api"
+      ],
+      [
+        "app-orders-api",
+        "web-storefront"
+      ]
+    ]
+  }
+}

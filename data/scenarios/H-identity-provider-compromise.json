@@ -1,0 +1,53 @@
+{
+  "id": "SCN-H-IDP-COMPROMISE",
+  "code": "H",
+  "title": "Identity provider compromise",
+  "category": "Credential compromise",
+  "severity": "critical",
+  "variation_of": "SCN-D-DEPENDENCY-UNAVAILABLE",
+  "narrative": "At 08:40 UTC an attacker forges tokens through the identity provider and destroys the storefront and Orders API deployments. The identity provider must be rebuilt from a trusted recovery point before anything that relies on it can return to service.",
+  "incident_at": "2026-10-20T09:00:00Z",
+  "plan_scope": "affected",
+  "injections": [
+    {
+      "type": "compromise_assets",
+      "at": "2026-10-20T08:40:00Z",
+      "asset_ids": [
+        "idp-core",
+        "app-orders-api",
+        "web-storefront"
+      ],
+      "description": "Identity provider signing keys abused; storefront and Orders API deployments destroyed."
+    }
+  ],
+  "recommended_actions": [
+    "Rebuild the identity provider first and rotate its signing keys",
+    "Then restore the Orders API, then the storefront"
+  ],
+  "expected": {
+    "blocked_assets": [],
+    "rto_breaches": [],
+    "rpo_breaches": [
+      "app-erp",
+      "aws-s3-exports",
+      "logging-siem"
+    ],
+    "selected_points": {
+      "idp-core": "RP-IDP-202610200830-P"
+    },
+    "order_constraints": [
+      [
+        "idp-core",
+        "app-orders-api"
+      ],
+      [
+        "idp-core",
+        "web-storefront"
+      ],
+      [
+        "app-orders-api",
+        "web-storefront"
+      ]
+    ]
+  }
+}

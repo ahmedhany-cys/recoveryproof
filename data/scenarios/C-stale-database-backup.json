@@ -1,0 +1,50 @@
+{
+  "id": "SCN-C-STALE-DB-BACKUP",
+  "code": "C",
+  "title": "Stale database backup",
+  "category": "Backup failure",
+  "severity": "high",
+  "narrative": "At 08:40 UTC a faulty schema migration corrupts the orders table, and the orders database must be restored. During recovery preparation the team finds that backup jobs for the database have failed silently since 07:00 UTC the previous day, after a credential rotation. The newest verified recovery point is more than a day old against a 15-minute RPO.",
+  "incident_at": "2026-10-20T09:00:00Z",
+  "plan_scope": "affected",
+  "injections": [
+    {
+      "type": "backup_job_failure",
+      "at": "2026-10-20T08:50:00Z",
+      "asset_id": "db-orders",
+      "failing_since": "2026-10-19T07:00:00Z",
+      "description": "Backup agent could not authenticate after credential rotation; failures were not alerted."
+    },
+    {
+      "type": "compromise_assets",
+      "at": "2026-10-20T08:40:00Z",
+      "asset_ids": [
+        "db-orders"
+      ],
+      "description": "Faulty migration corrupted the orders table; database must be restored from backup."
+    }
+  ],
+  "recommended_actions": [
+    "Restore from the newest verified point and rebuild lost orders from upstream systems",
+    "Alert on missed backup jobs within one schedule interval",
+    "Tell dependent teams (Orders API, Storefront, ERP) how much data was lost"
+  ],
+  "expected": {
+    "readiness_min": 75,
+    "readiness_max": 85,
+    "blocked_assets": [],
+    "rto_breaches": [],
+    "rpo_breaches": [
+      "app-erp",
+      "aws-s3-exports",
+      "db-orders",
+      "logging-siem"
+    ],
+    "required_rules": [
+      "RP-002"
+    ],
+    "selected_points": {
+      "db-orders": "RP-DBORD-202610190645-P"
+    }
+  }
+}

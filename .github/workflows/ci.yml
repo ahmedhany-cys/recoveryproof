@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, types and security
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -c requirements-lock.txt -e ".[dev]"
+      - name: Ruff (lint)
+        run: ruff check src tests scripts
+      - name: Ruff (format)
+        run: ruff format --check src tests scripts
+      - name: Mypy (strict)
+        run: mypy
+      - name: Bandit
+        run: bandit -c pyproject.toml -r src scripts
+      - name: pip-audit (known vulnerabilities)
+        run: pip-audit --skip-editable
+
+  test:
+    name: Tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -c requirements-lock.txt -e ".[dev]"
+      - name: Pytest with coverage
+        run: pytest --cov --cov-report=term --cov-report=xml --cov-fail-under=90
+      - name: Core engine coverage gate (excluding UI)
+        run: coverage report --omit="*/ui/*" --fail-under=95
+      - name: Scenario expectation checks via CLI
+        run: for s in A B C D E F G H I J; do recoveryproof analyze --scenario "$s" --check; done
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: matrix.python == '3.13'
+        with:
+          name: coverage-xml
+          path: coverage.xml
+
+  smoke:
+    name: App startup smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -c requirements-lock.txt -e .
+      - name: Start Streamlit and probe health endpoint
+        run: |
+          streamlit run app.py --server.port 8501 --server.headless true > streamlit.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8501/_stcore/health; then echo; break; fi
+            sleep 2
+          done
+          curl -fsS http://127.0.0.1:8501/_stcore/health
+          curl -fsS http://127.0.0.1:8501/ | grep -q "<title>"
+          if grep -qi "traceback" streamlit.log; then cat streamlit.log; exit 1; fi
