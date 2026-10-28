@@ -10,9 +10,16 @@ from recoveryproof.ui import pages
 from recoveryproof.ui.components import BAND_COLORS, inject_css
 from recoveryproof.ui.state import accept_upload, clear_upload, get_ctx, init_state, set_scenario
 
+
+def _overview_alias() -> None:
+    """Serves /overview: Streamlit always mounts the default page at '/'."""
+    pages.executive_overview()
+
+
 PAGES = {
     "Overview": [
-        st.Page(pages.executive_overview, title="Executive Overview", icon="📊", url_path="overview", default=True),
+        st.Page(pages.executive_overview, title="Executive Overview", icon="📊", default=True),
+        st.Page(_overview_alias, title="Executive Overview", url_path="overview", visibility="hidden"),
         st.Page(pages.asset_inventory, title="Asset Inventory", icon="🗂️", url_path="assets"),
         st.Page(pages.backup_health, title="Backup Health", icon="💾", url_path="backups"),
         st.Page(pages.dependency_graph, title="Dependency Graph", icon="🕸️", url_path="dependencies"),
