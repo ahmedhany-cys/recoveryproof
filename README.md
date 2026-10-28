@@ -1,5 +1,7 @@
 # 🛡️ RecoveryProof
 
+[![CI](https://github.com/ahmedhany-cys/recoveryproof/actions/workflows/ci.yml/badge.svg)](https://github.com/ahmedhany-cys/recoveryproof/actions/workflows/ci.yml)
+
 **Prove recovery before disaster strikes.**
 
 RecoveryProof is an evidence-based disaster-recovery and cyber-resilience analysis
@@ -247,7 +249,9 @@ Verified locally on 2026-10-28 (Python 3.13.5, macOS arm64):
 
 A GitHub Actions workflow ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs lint,
 types, security scans, tests on Python 3.12 and 3.13, coverage gates and an app-startup smoke
-test. Its result on GitHub is only known once the repository has been pushed and the workflow has run.
+test. The first run on GitHub ([run 40657113277](https://github.com/ahmedhany-cys/recoveryproof/actions/runs/40657113277), 2026-10-28) passed all four jobs:
+lint/types/security, tests on Python 3.12 and 3.13, and the app smoke test. The badge at the top
+shows the status of the latest run.
 
 ## Security model
 

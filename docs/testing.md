@@ -16,8 +16,15 @@
 | Terraform template | `terraform fmt -check -recursive infra/terraform` | clean (not `init`/`validate`d, not applied) |
 
 The CI workflow (`.github/workflows/ci.yml`) runs the same gates on Python 3.12 and 3.13,
-plus an app-startup smoke test. **Its result on GitHub has not been observed yet.** It runs
-once the repository is pushed.
+plus an app-startup smoke test. The first run on GitHub passed
+([run 40657113277](https://github.com/ahmedhany-cys/recoveryproof/actions/runs/40657113277), triggered by the first push on 2026-10-28):
+
+| Job | Result | Duration |
+|---|---|---|
+| Lint, types and security | passed | 1m12s |
+| Tests (Python 3.13), incl. coverage gates | passed | 1m01s |
+| Tests (Python 3.12) | passed | 1m38s |
+| App startup smoke test | passed | 40s |
 
 ## What the suite covers
 
